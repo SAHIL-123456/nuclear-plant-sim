@@ -1,0 +1,12 @@
+name = "power-plant-iot-system"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[durable_objects]
+bindings = [
+  { name = "PLANT_STATE", class_name = "PlantState" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["PlantState"]

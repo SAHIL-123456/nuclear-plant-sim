@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuclear Power Plant Control System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+      color: #fff;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    
+    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .star { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
+    @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+    
+    .container { position: relative; z-index: 1; max-width: 1920px; margin: 0 auto; padding: 20px; }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px;
+      background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,200,255,0.1) 100%);
+      border-radius: 20px;
+      border: 2px solid rgba(0,255,136,0.3);
+      box-shadow: 0 0 40px rgba(0,255,136,0.2), inset 0 0 40px rgba(0,255,136,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(0,255,136,0.1), transparent);
+      animation: scan 4s linear infinite;
+    }
+    
+    @keyframes scan {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+    
+    .header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5em;
+      font-weight: 900;
+      background: linear-gradient(90deg, #00ff88, #00c8ff, #00ff88);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradient 3s linear infinite;
+      text-shadow: 0 0 30px rgba(0,255,136,0.5);
+      position: relative;
+      z-index: 1;
+    }
+    
+    @keyframes gradient { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+    
+    .header p {
+      font-size: 1.3em;
+      color: #00c8ff;
+      margin-top: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .connection-status {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 1.1em;
+      z-index: 1000;
+      box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      border: 2px solid;
+      animation: statusPulse 2s infinite;
+      cursor: pointer;
+    }
+    
+    @keyframes statusPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    
+    .connection-status.connected {
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      color: #000;
+      border-color: #00ff88;
+      box-shadow: 0 5px 30px rgba(0,255,136,0.5);
+    }
+    
+    .connection-status.disconnected {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: #fff;
+      border-color: #ff4444;
+      box-shadow: 0 5px 30px rgba(255,68,68,0.5);
+      animation: errorBlink 1s infinite;
+    }
+    
+    @keyframes errorBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    
+    .control-panel {
+      background: linear-gradient(135deg, #0f1923 0%, #1a2332 100%);
+      border-radius: 20px;
+      padding: 30px;
+      border: 2px solid rgba(0,255,136,0.3);
+      box-shadow: 0 10px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .control-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00ff88, transparent);
+      animation: topGlow 2s linear infinite;
+    }
+    
+    @keyframes topGlow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    
+    .card {
+      background: linear-gradient(135deg, #0f1923 0%, #1a2332 100%);
+      border-radius: 20px;
+      padding: 25px;
+      border: 2px solid rgba(0,200,255,0.3);
+      box-shadow: 0 10px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 60px rgba(0,200,255,0.3);
+      border-color: rgba(0,200,255,0.6);
+    }
+    
+    .card h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #00ff88;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0,255,136,0.3);
+    }
+    
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      border-left: 4px solid #00c8ff;
+      margin: 12px 0;
+      transition: all 0.3s ease;
+    }
+    
+    .metric:hover {
+      background: rgba(0,200,255,0.1);
+      transform: translateX(5px);
+    }
+    
+    .metric-label {
+      color: #8899aa;
+      font-size: 1.1em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .metric-value {
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.4em;
+      text-shadow: 0 0 10px rgba(0,255,136,0.5);
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 1em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      animation: badgePulse 2s infinite;
+    }
+    
+    @keyframes badgePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    
+    .status-badge.stable {
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      color: #000;
+      box-shadow: 0 5px 20px rgba(0,255,136,0.5);
+    }
+    
+    .status-badge.warning {
+      background: linear-gradient(135deg, #ffa500, #ff8c00);
+      color: #000;
+      box-shadow: 0 5px 20px rgba(255,165,0,0.5);
+      animation: warningPulse 1s infinite;
+    }
+    
+    @keyframes warningPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+    
+    .status-badge.critical {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: #fff;
+      box-shadow: 0 5px 20px rgba(255,68,68,0.5);
+      animation: criticalBlink 0.5s infinite;
+    }
+    
+    @keyframes criticalBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    
+    .module-toggle {
+      float: right;
+      padding: 5px 15px;
+      font-size: 0.6em;
+      border-radius: 15px;
+      cursor: pointer;
+      color: #000;
+      border: none;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: -5px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    .module-toggle.on {
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      box-shadow: 0 5px 20px rgba(0,255,136,0.5);
+    }
+    .module-toggle.off {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: #fff;
+      box-shadow: 0 5px 20px rgba(255,68,68,0.5);
+    }
+    
+    .control-group {
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 15px;
+      border: 1px solid rgba(0,255,136,0.2);
+    }
+    
+    .control-group label {
+      display: block;
+      margin-bottom: 15px;
+      color: #00ff88;
+      font-weight: 700;
+      font-size: 1.2em;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #1a2332, #2a3342);
+      outline: none;
+      border: 1px solid rgba(0,255,136,0.3);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+      cursor: pointer;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00ff88, #00c8ff);
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0,255,136,0.8), 0 5px 15px rgba(0,0,0,0.5);
+      transition: all 0.3s ease;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 30px rgba(0,255,136,1), 0 5px 20px rgba(0,0,0,0.7);
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      cursor: pointer;
+      accent-color: #00ff88;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      color: #000;
+      border: none;
+      padding: 15px 35px;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(0,255,136,0.3);
+      margin: 5px;
+    }
+    
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0,255,136,0.5);
+    }
+    
+    button.danger {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: #fff;
+      box-shadow: 0 5px 20px rgba(255,68,68,0.3);
+    }
+    
+    button.danger:hover {
+      box-shadow: 0 8px 30px rgba(255,68,68,0.5);
+    }
+    
+    button.emergency {
+      background: linear-gradient(135deg, #ffa500, #ff8c00);
+      color: #000;
+      box-shadow: 0 5px 20px rgba(255,165,0,0.3);
+      animation: emergencyGlow 2s infinite;
+    }
+    
+    @keyframes emergencyGlow {
+      0%, 100% { box-shadow: 0 5px 20px rgba(255,165,0,0.3); }
+      50% { box-shadow: 0 5px 30px rgba(255,165,0,0.8); }
+    }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 30px; }
+    
+    .chart-container {
+      background: rgba(0,0,0,0.4);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      height: 300px;
+      border: 1px solid rgba(0,200,255,0.3);
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+    }
+    
+    canvas { width: 100% !important; height: 100% !important; }
+    
+    .alarm {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin: 10px 0;
+      font-weight: 700;
+      font-size: 1.1em;
+      box-shadow: 0 5px 20px rgba(255,68,68,0.5);
+      animation: alarmPulse 1s infinite;
+      border-left: 5px solid #fff;
+    }
+    
+    @keyframes alarmPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.02); }
+    }
+    
+    @media (max-width: 768px) {
+      .header h1 { font-size: 2em; }
+      .header p { font-size: 1em; }
+      .connection-status { top: 10px; right: 10px; padding: 10px 20px; font-size: 0.9em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  <div class="container">
+  <div class="connection-status" id="connectionStatus" onclick="toggleConnection()">● CONNECTING...</div>
+  
+  <div class="header">
+    <h1>⚛️ NUCLEAR POWER PLANT</h1>
+    <p>Advanced Control & Monitoring System</p>
+  </div>
+
+  <div class="control-panel">
+    <h2 style="font-family: 'Orbitron', sans-serif; color: #00ff88; margin-bottom: 20px;">🎛️ CONTROL PANEL</h2>
+    <div class="control-group">
+      <label>Control Rods Position: <span id="rodValue" style="color: #00c8ff; font-family: 'Orbitron', sans-serif;">80</span>%</label>
+      <input type="range" id="controlRods" min="0" max="100" value="80">
+    </div>
+    <div class="control-group">
+      <label>Cooling Flow Rate: <span id="flowValue" style="color: #00c8ff; font-family: 'Orbitron', sans-serif;">15000</span> L/min</label>
+      <input type="range" id="flowRate" min="5000" max="25000" value="15000" step="1000">
+    </div>
+    <div class="control-group">
+      <label>Generator Load: <span id="loadValue" style="color: #00c8ff; font-family: 'Orbitron', sans-serif;">70</span>%</label>
+      <input type="range" id="generatorLoad" min="0" max="100" value="70">
+    </div>
+    <div class="control-group">
+      <label><input type="checkbox" id="autoShutdown" checked> Auto Safety Shutdown System</label>
+    </div>
+    <div>
+      <button onclick="emergencyCooling()" class="emergency">🚨 EMERGENCY COOLING</button>
+      <button onclick="resetPlant()" class="danger">🔄 RESET PLANT</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>⚛️ REACTOR CORE <button class="module-toggle on" id="toggle-reactor" onclick="toggleModule('reactor')">ON</button></h2>
+      <div class="metric"><span class="metric-label">Temperature:</span><span class="metric-value" id="reactorTemp">300°C</span></div>
+      <div class="metric"><span class="metric-label">Pressure:</span><span class="metric-value" id="reactorPressure">155 bar</span></div>
+      <div class="metric"><span class="metric-label">Control Rods:</span><span class="metric-value" id="reactorRods">80%</span></div>
+      <div class="metric"><span class="metric-label">Fuel Level:</span><span class="metric-value" id="fuelLevel">100%</span></div>
+      <div class="metric"><span class="metric-label">Status:</span><span class="status-badge stable" id="reactorStatus">STABLE</span></div>
+    </div>
+
+    <div class="card">
+      <h2>⚡ GENERATOR <button class="module-toggle on" id="toggle-generator" onclick="toggleModule('generator')">ON</button></h2>
+      <div class="metric"><span class="metric-label">Power Output:</span><span class="metric-value" id="powerOutput">1000 MW</span></div>
+      <div class="metric"><span class="metric-label">Load:</span><span class="metric-value" id="generatorLoadDisplay">70%</span></div>
+      <div class="metric"><span class="metric-label">Voltage:</span><span class="metric-value" id="voltage">25000 V</span></div>
+      <div class="metric"><span class="metric-label">Frequency:</span><span class="metric-value" id="frequency">50.00 Hz</span></div>
+      <div class="metric"><span class="metric-label">Efficiency:</span><span class="metric-value" id="efficiency">95%</span></div>
+    </div>
+
+    <div class="card">
+      <h2>❄️ COOLING SYSTEM <button class="module-toggle on" id="toggle-cooling" onclick="toggleModule('cooling')">ON</button></h2>
+      <div class="metric"><span class="metric-label">Primary Temp:</span><span class="metric-value" id="primaryTemp">290°C</span></div>
+      <div class="metric"><span class="metric-label">Secondary Temp:</span><span class="metric-value" id="secondaryTemp">40°C</span></div>
+      <div class="metric"><span class="metric-label">Flow Rate:</span><span class="metric-value" id="coolingFlow">15000 L/min</span></div>
+      <div class="metric"><span class="metric-label">Pump Status:</span><span class="metric-value" id="pumpStatus">OPERATIONAL</span></div>
+    </div>
+
+    <div class="card">
+      <h2>🌀 TURBINE <button class="module-toggle on" id="toggle-turbine" onclick="toggleModule('turbine')">ON</button></h2>
+      <div class="metric"><span class="metric-label">Speed:</span><span class="metric-value" id="turbineSpeed">1800 RPM</span></div>
+      <div class="metric"><span class="metric-label">Steam Pressure:</span><span class="metric-value" id="steamPressure">70 bar</span></div>
+      <div class="metric"><span class="metric-label">Vibration:</span><span class="metric-value" id="vibration">0.5 mm/s</span></div>
+      <div class="metric"><span class="metric-label">Status:</span><span class="status-badge stable" id="turbineStatus">NORMAL</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 30px;">
+    <h2>🛡️ SAFETY SYSTEMS</h2>
+    <div class="metric"><span class="metric-label">Radiation Level:</span><span class="metric-value" id="radiation">0.1 mSv/h</span></div>
+    <div class="metric"><span class="metric-label">Emergency Cooling:</span><span class="metric-value" id="emergStatus">OFF</span></div>
+    <div id="alarms"></div>
+  </div>
+
+  <div class="card">
+    <h2>📊 LIVE PERFORMANCE GRAPHS</h2>
+    <div class="chart-container"><canvas id="tempChart"></canvas></div>
+    <div class="chart-container"><canvas id="powerChart"></canvas></div>
+    <div class="chart-container"><canvas id="generatorChart"></canvas></div>
+    <div class="chart-container"><canvas id="coolingChart"></canvas></div>
+    <div class="chart-container"><canvas id="safetyChart"></canvas></div>
+  </div>
+  
+  </div>
+
+  <script>
+    // Create stars background
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 100; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.animationDelay = Math.random() * 3 + 's';
+      starsContainer.appendChild(star);
+    }
+    
+    let ws;
+    let forceDisconnect = false;
+    let tempData = [], powerData = [], turbineData = [], pressureData = [], labels = [];
+
+    function toggleModule(sys) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        let payload = {};
+        let toggleBtn = document.getElementById('toggle-' + sys);
+        let isCurrentlyOn = toggleBtn.classList.contains('on');
+        payload[sys + 'Active'] = !isCurrentlyOn;
+        ws.send(JSON.stringify(payload));
+      }
+    }
+
+    function toggleConnection() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        forceDisconnect = true;
+        ws.close();
+      } else if (!ws || ws.readyState === WebSocket.CLOSED) {
+        forceDisconnect = false;
+        connect();
+      }
+    }
+
+    function connect() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(protocol + '//' + window.location.host + '/ws');
+      
+      ws.onopen = () => {
+        console.log('WebSocket connected');
+        document.getElementById('connectionStatus').textContent = '● CONNECTED';
+        document.getElementById('connectionStatus').className = 'connection-status connected';
+      };
+      
+      ws.onmessage = (event) => {
+        console.log('WebSocket message received');
+        try {
+          const data = JSON.parse(event.data);
+          updateDashboard(data);
+        } catch (e) {
+          console.error('Error parsing WebSocket data:', e);
+        }
+      };
+      
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      
+      ws.onclose = () => {
+        console.log('WebSocket disconnected');
+        document.getElementById('connectionStatus').textContent = '● DISCONNECTED';
+        document.getElementById('connectionStatus').className = 'connection-status disconnected';
+        if (!forceDisconnect) {
+          setTimeout(connect, 3000);
+        }
+      };
+    }
+
+    function updateDashboard(data) {
+      console.log('Updating dashboard with data:', data);
+      
+      // Reactor
+      if (data.reactor) {
+        document.getElementById('reactorTemp').textContent = Math.round(data.reactor.temperature) + '°C';
+        document.getElementById('reactorPressure').textContent = Math.round(data.reactor.pressure) + ' bar';
+        document.getElementById('reactorRods').textContent = data.reactor.controlRods + '%';
+        document.getElementById('fuelLevel').textContent = data.reactor.fuelLevel.toFixed(2) + '%';
+        updateStatus('reactorStatus', data.reactor.status);
+      }
+
+      // Update sliders from server (multi-user sync)
+      const controlRodsSlider = document.getElementById('controlRods');
+      const flowRateSlider = document.getElementById('flowRate');
+      const generatorLoadSlider = document.getElementById('generatorLoad');
+      const autoShutdownCheckbox = document.getElementById('autoShutdown');
+      
+      if (data.reactor && controlRodsSlider.value != data.reactor.controlRods) {
+        controlRodsSlider.value = data.reactor.controlRods;
+        document.getElementById('rodValue').textContent = data.reactor.controlRods;
+      }
+      
+      if (data.cooling && flowRateSlider.value != data.cooling.flowRate) {
+        flowRateSlider.value = data.cooling.flowRate;
+        document.getElementById('flowValue').textContent = data.cooling.flowRate;
+      }
+      
+      if (data.generator && generatorLoadSlider.value != data.generator.load) {
+        generatorLoadSlider.value = data.generator.load;
+        document.getElementById('loadValue').textContent = data.generator.load;
+      }
+      
+      if (data.safety && autoShutdownCheckbox.checked !== data.safety.autoShutdown) {
+        autoShutdownCheckbox.checked = data.safety.autoShutdown;
+      }
+
+      // Generator
+      if (data.generator) {
+        document.getElementById('powerOutput').textContent = data.generator.powerOutput + ' MW';
+        document.getElementById('generatorLoadDisplay').textContent = data.generator.load + '%';
+        document.getElementById('voltage').textContent = data.generator.voltage + ' V';
+        document.getElementById('frequency').textContent = data.generator.frequency.toFixed(2) + ' Hz';
+        document.getElementById('efficiency').textContent = data.generator.efficiency.toFixed(1) + '%';
+      }
+
+      // Cooling
+      if (data.cooling) {
+        document.getElementById('primaryTemp').textContent = Math.round(data.cooling.primaryTemp) + '°C';
+        document.getElementById('secondaryTemp').textContent = Math.round(data.cooling.secondaryTemp) + '°C';
+        document.getElementById('coolingFlow').textContent = data.cooling.flowRate + ' L/min';
+        document.getElementById('pumpStatus').textContent = data.cooling.pumpStatus.toUpperCase();
+      }
+
+      // Turbine
+      if (data.turbine) {
+        document.getElementById('turbineSpeed').textContent = data.turbine.speed + ' RPM';
+        document.getElementById('steamPressure').textContent = Math.round(data.turbine.steamPressure) + ' bar';
+        document.getElementById('vibration').textContent = data.turbine.vibration.toFixed(2) + ' mm/s';
+        updateStatus('turbineStatus', data.turbine.status);
+      }
+
+      if (data.systemActive) {
+        ['reactor', 'generator', 'cooling', 'turbine'].forEach(sys => {
+          let btn = document.getElementById('toggle-' + sys);
+          if (btn) {
+            let active = data.systemActive[sys];
+            btn.textContent = active ? 'ON' : 'OFF';
+            btn.className = 'module-toggle ' + (active ? 'on' : 'off');
+          }
+        });
+      }
+
+      // Safety
+      if (data.safety) {
+        document.getElementById('radiation').textContent = data.safety.radiationLevel.toFixed(2) + ' mSv/h';
+        document.getElementById('emergStatus').textContent = data.safety.emergencyCooling ? 'ACTIVE' : 'OFF';
+        
+        const alarmsDiv = document.getElementById('alarms');
+        alarmsDiv.innerHTML = '';
+        if (data.safety.alarms && data.safety.alarms.length > 0) {
+          data.safety.alarms.forEach(alarm => {
+            const div = document.createElement('div');
+            div.className = 'alarm';
+            div.textContent = '⚠️ ' + alarm.replace(/_/g, ' ');
+            alarmsDiv.appendChild(div);
+          });
+        }
+      }
+
+      // Update charts
+      if (data.history && data.history.length > 0) {
+        updateCharts(data.history);
+      }
+    }
+
+    function updateStatus(id, status) {
+      const el = document.getElementById(id);
+      el.textContent = status.toUpperCase();
+      el.className = 'status-badge ' + status;
+    }
+
+    function updateCharts(history) {
+      labels = history.map((_, i) => i);
+      tempData = history.map(h => h.temp);
+      powerData = history.map(h => h.power);
+      turbineData = history.map(h => h.turbineSpeed);
+      pressureData = history.map(h => h.pressure);
+      const voltageData = history.map(h => h.voltage / 1000);
+      const frequencyData = history.map(h => h.frequency);
+      const efficiencyData = history.map(h => h.efficiency);
+      const loadData = history.map(h => h.load);
+      const coolingPrimaryData = history.map(h => h.coolingPrimary);
+      const coolingSecondaryData = history.map(h => h.coolingSecondary);
+      const flowRateData = history.map(h => h.flowRate / 1000);
+      const vibrationData = history.map(h => h.vibration);
+      const radiationData = history.map(h => h.radiation);
+      
+      drawChart('tempChart', [
+        { label: 'Temperature (°C)', data: tempData, color: '#ff6384' },
+        { label: 'Pressure (bar)', data: pressureData, color: '#36a2eb' }
+      ]);
+      
+      drawChart('powerChart', [
+        { label: 'Power (MW)', data: powerData, color: '#00ff88' },
+        { label: 'Turbine Speed (RPM/10)', data: turbineData.map(v => v/10), color: '#ffce56' }
+      ]);
+      
+      drawChart('generatorChart', [
+        { label: 'Voltage (kV)', data: voltageData, color: '#00c8ff' },
+        { label: 'Frequency (Hz)', data: frequencyData, color: '#ff6384' },
+        { label: 'Efficiency (%)', data: efficiencyData, color: '#00ff88' },
+        { label: 'Load (%)', data: loadData, color: '#ffa500' }
+      ]);
+      
+      drawChart('coolingChart', [
+        { label: 'Primary Temp (°C)', data: coolingPrimaryData, color: '#ff6384' },
+        { label: 'Secondary Temp (°C)', data: coolingSecondaryData, color: '#36a2eb' },
+        { label: 'Flow Rate (k L/min)', data: flowRateData, color: '#00c8ff' }
+      ]);
+      
+      drawChart('safetyChart', [
+        { label: 'Vibration (mm/s)', data: vibrationData, color: '#ffa500' },
+        { label: 'Radiation (mSv/h)', data: radiationData, color: '#ff4444' }
+      ]);
+    }
+
+    function drawChart(canvasId, datasets) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width = canvas.offsetWidth;
+      const height = canvas.height = canvas.offsetHeight;
+      
+      ctx.clearRect(0, 0, width, height);
+      
+      const padding = 40;
+      const chartWidth = width - padding * 2;
+      const chartHeight = height - padding * 2;
+      
+      datasets.forEach(dataset => {
+        const max = Math.max(...dataset.data, 1);
+        const min = Math.min(...dataset.data, 0);
+        const range = max - min || 1;
+        
+        ctx.strokeStyle = dataset.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        
+        dataset.data.forEach((value, i) => {
+          const x = padding + (i / (dataset.data.length - 1)) * chartWidth;
+          const y = padding + chartHeight - ((value - min) / range) * chartHeight;
+          
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        
+        ctx.stroke();
+        
+        ctx.fillStyle = dataset.color;
+        ctx.font = '12px Arial';
+        ctx.fillText(dataset.label, padding, padding - 20 + datasets.indexOf(dataset) * 15);
+      });
+      
+      ctx.strokeStyle = '#444';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(padding, padding, chartWidth, chartHeight);
+    }
+
+    document.getElementById('controlRods').addEventListener('input', (e) => {
+      document.getElementById('rodValue').textContent = e.target.value;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ controlRods: parseInt(e.target.value) }));
+      }
+    });
+
+    document.getElementById('flowRate').addEventListener('input', (e) => {
+      document.getElementById('flowValue').textContent = e.target.value;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ flowRate: parseInt(e.target.value) }));
+      }
+    });
+
+    document.getElementById('generatorLoad').addEventListener('input', (e) => {
+      document.getElementById('loadValue').textContent = e.target.value;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ generatorLoad: parseInt(e.target.value) }));
+      }
+    });
+
+    document.getElementById('autoShutdown').addEventListener('change', (e) => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ autoShutdown: e.target.checked }));
+      }
+    });
+
+    function emergencyCooling() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ emergencyCooling: true }));
+      }
+    }
+
+    function resetPlant() {
+      if (confirm('Reset the entire plant to initial state?')) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ reset: true }));
+        }
+      }
+    }
+
+    connect();
+  </script>
+</body>
+</html>
