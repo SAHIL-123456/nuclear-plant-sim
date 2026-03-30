@@ -20,6 +20,12 @@ function getInitialState() {
     turbine: { speed: 1800, steamPressure: 70, vibration: 0.5, status: 'normal' },
     safety: { autoShutdown: true, emergencyCooling: false, radiationLevel: 0.1, alarms: [] },
     systemActive: { reactor: true, generator: true, cooling: true, turbine: true },
+    offsets: {
+      tempTarget: 300,
+      pressureTarget: 155,
+      frequencyTarget: 50,
+      vibrationBase: 0.3
+    },
     timestamp: Date.now(),
     history: []
   };
@@ -35,13 +41,15 @@ function startSimulation() {
     // Reactor simulation
     if (!state.systemActive.reactor) {
       controlRodFactor = 0;
-      if (state.reactor.temperature > 250) state.reactor.temperature -= 4; // Cool down if off
+      if (state.reactor.temperature > 40) state.reactor.temperature -= 4; // Cool down if off
     } else {
-      state.reactor.temperature += (controlRodFactor * 5 - 2) + (Math.random() - 0.5) * 2;
+      // Aim for tempTarget using control rods and offsets
+      const targetDiff = state.offsets.tempTarget - state.reactor.temperature;
+      state.reactor.temperature += (controlRodFactor * 5 - 2) + (targetDiff * 0.05) + (Math.random() - 0.5) * 2;
       state.reactor.fuelLevel = Math.max(0, state.reactor.fuelLevel - 0.001);
     }
-    state.reactor.temperature = Math.max(250, Math.min(600, state.reactor.temperature));
-    state.reactor.pressure = 150 + (state.reactor.temperature - 300) * 0.5;
+    state.reactor.temperature = Math.max(25, Math.min(600, state.reactor.temperature));
+    state.reactor.pressure = state.offsets.pressureTarget + (state.reactor.temperature - 300) * 0.5 + (Math.random() - 0.5);
     
     // Turbine
     let steamFactor = state.reactor.pressure / 155;
@@ -66,7 +74,7 @@ function startSimulation() {
     } else {
       state.generator.powerOutput = Math.round(tempFactor * state.turbine.speed * 0.6 * loadFactor);
       state.generator.voltage = 24000 + state.generator.powerOutput * 2;
-      state.generator.frequency = 50 - (loadFactor * 0.5) + Math.random() * 0.5;
+      state.generator.frequency = state.offsets.frequencyTarget - (loadFactor * 0.5) + Math.random() * 0.5;
       state.generator.efficiency = Math.min(98, 85 + tempFactor * 10 - (Math.abs(loadFactor - 0.8) * 5));
     }
     
@@ -161,6 +169,9 @@ function handleControl(data) {
   if (data.emergencyCooling !== undefined) {
     state.safety.emergencyCooling = data.emergencyCooling;
   }
+  if (data.offsets !== undefined) {
+    state.offsets = { ...state.offsets, ...data.offsets };
+  }
   if (data.reactorActive !== undefined) state.systemActive.reactor = data.reactorActive;
   if (data.generatorActive !== undefined) state.systemActive.generator = data.generatorActive;
   if (data.coolingActive !== undefined) state.systemActive.cooling = data.coolingActive;
@@ -168,6 +179,7 @@ function handleControl(data) {
   
   if (data.reset) {
     state = getInitialState();
+    state.history = []; // Explicitly clear history
   }
   broadcast(state);
 }

@@ -131,6 +131,59 @@
     
     @keyframes topGlow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
     
+    .manual-section {
+      background: rgba(0, 255, 136, 0.05);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+    
+    .manual-section h3 {
+      color: #00ff88;
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .settings-panel {
+      display: none;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(0, 255, 136, 0.2);
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    
+    .settings-panel.active { display: block; }
+    
+    .settings-btn {
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: #00ff88;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.8em;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+      transition: all 0.3s;
+    }
+    
+    .settings-btn:hover { background: rgba(0, 255, 136, 0.2); }
+
+    .chart-desc {
+      font-size: 0.9em;
+      color: #8899aa;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
     .card {
       background: linear-gradient(135deg, #0f1923 0%, #1a2332 100%);
       border-radius: 20px;
@@ -398,6 +451,17 @@
     <p>Advanced Control & Monitoring System</p>
   </div>
 
+  <div class="manual-section">
+    <h3>📖 OPERATION MANUAL & NORMS</h3>
+    <p>Welcome, Operator. This dashboard provides real-time telemetry from the nuclear reactor. To maintain safety, follow these <strong>Basic Norms</strong>:</p>
+    <ul style="margin-left: 20px; margin-top: 10px; color: #8899aa;">
+      <li><strong>Stable Temperature:</strong> Keep the reactor core between 250°C and 450°C. Above 550°C is <strong>CRITICAL</strong>.</li>
+      <li><strong>Power Grid:</strong> Target 50.00 Hz frequency. Fluctuations indicate unstable load or turbine issues.</li>
+      <li><strong>Control Rods:</strong> Inserting rods (higher %) slows the nuclear reaction and drops temperature.</li>
+      <li><strong>Cooling:</strong> Ensure flow rate stays above 10,000 L/min to prevent rapid heat spikes.</li>
+    </ul>
+  </div>
+
   <div class="control-panel">
     <h2 style="font-family: 'Orbitron', sans-serif; color: #00ff88; margin-bottom: 20px;">🎛️ CONTROL PANEL</h2>
     <div class="control-group">
@@ -423,21 +487,35 @@
 
   <div class="grid">
     <div class="card">
-      <h2>⚛️ REACTOR CORE <button class="module-toggle on" id="toggle-reactor" onclick="toggleModule('reactor')">ON</button></h2>
+      <h2>⚛️ REACTOR <button class="module-toggle on" id="toggle-reactor" onclick="toggleModule('reactor')">ON</button></h2>
       <div class="metric"><span class="metric-label">Temperature:</span><span class="metric-value" id="reactorTemp">300°C</span></div>
       <div class="metric"><span class="metric-label">Pressure:</span><span class="metric-value" id="reactorPressure">155 bar</span></div>
       <div class="metric"><span class="metric-label">Control Rods:</span><span class="metric-value" id="reactorRods">80%</span></div>
       <div class="metric"><span class="metric-label">Fuel Level:</span><span class="metric-value" id="fuelLevel">100%</span></div>
       <div class="metric"><span class="metric-label">Status:</span><span class="status-badge stable" id="reactorStatus">STABLE</span></div>
+      
+      <button class="settings-btn" onclick="toggleSettings('reactor-settings')">⚙️ CUSTOM SETTINGS</button>
+      <div id="reactor-settings" class="settings-panel">
+        <label style="font-size: 0.8em; color: #00ff88;">Target Temp (°C): <span id="tempTargetVal">300</span></label>
+        <input type="range" min="100" max="600" value="300" oninput="updateOffset('tempTarget', this.value)">
+        <label style="font-size: 0.8em; color: #00ff88; margin-top: 10px; display: block;">Target Pressure (bar): <span id="pressTargetVal">155</span></label>
+        <input type="range" min="50" max="300" value="155" oninput="updateOffset('pressureTarget', this.value)">
+      </div>
     </div>
 
     <div class="card">
       <h2>⚡ GENERATOR <button class="module-toggle on" id="toggle-generator" onclick="toggleModule('generator')">ON</button></h2>
-      <div class="metric"><span class="metric-label">Power Output:</span><span class="metric-value" id="powerOutput">1000 MW</span></div>
+      <div class="metric"><span class="metric-label">Power:</span><span class="metric-value" id="powerOutput">1000 MW</span></div>
       <div class="metric"><span class="metric-label">Load:</span><span class="metric-value" id="generatorLoadDisplay">70%</span></div>
       <div class="metric"><span class="metric-label">Voltage:</span><span class="metric-value" id="voltage">25000 V</span></div>
       <div class="metric"><span class="metric-label">Frequency:</span><span class="metric-value" id="frequency">50.00 Hz</span></div>
       <div class="metric"><span class="metric-label">Efficiency:</span><span class="metric-value" id="efficiency">95%</span></div>
+
+      <button class="settings-btn" onclick="toggleSettings('gen-settings')">⚙️ CUSTOM SETTINGS</button>
+      <div id="gen-settings" class="settings-panel">
+        <label style="font-size: 0.8em; color: #00ff88;">Target Frequency (Hz): <span id="freqTargetVal">50.0</span></label>
+        <input type="range" min="45" max="55" step="0.1" value="50" oninput="updateOffset('frequencyTarget', this.value)">
+      </div>
     </div>
 
     <div class="card">
@@ -466,11 +544,36 @@
 
   <div class="card">
     <h2>📊 LIVE PERFORMANCE GRAPHS</h2>
-    <div class="chart-container"><canvas id="tempChart"></canvas></div>
-    <div class="chart-container"><canvas id="powerChart"></canvas></div>
-    <div class="chart-container"><canvas id="generatorChart"></canvas></div>
-    <div class="chart-container"><canvas id="coolingChart"></canvas></div>
-    <div class="chart-container"><canvas id="safetyChart"></canvas></div>
+    
+    <div>
+      <h3 style="color: #00ff88; font-size: 1em;">🌡️ CORE THERMODYNAMICS</h3>
+      <p class="chart-desc">Tracks core heat and pressure. Stable range: 250-450°C. Spikes in pressure often follow heat spikes.</p>
+      <div class="chart-container"><canvas id="tempChart"></canvas></div>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h3 style="color: #00ff88; font-size: 1em;">⚡ POWER GENERATION</h3>
+      <p class="chart-desc">Tracks electricity output (MW) against Turbine speed. Higher RPM produces more power but increases vibration.</p>
+      <div class="chart-container"><canvas id="powerChart"></canvas></div>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h3 style="color: #00ff88; font-size: 1em;">🔌 GRID STABILITY</h3>
+      <p class="chart-desc">Monitors Voltage and Frequency. Frequency must stay near 50Hz to prevent grid failure.</p>
+      <div class="chart-container"><canvas id="generatorChart"></canvas></div>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h3 style="color: #00ff88; font-size: 1em;">❄️ COOLING EFFICIENCY</h3>
+      <p class="chart-desc">Compares primary coolant temp vs secondary discharge. High flow rates lead to better cooling.</p>
+      <div class="chart-container"><canvas id="coolingChart"></canvas></div>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h3 style="color: #00ff88; font-size: 1em;">⚠️ SAFETY & VIBRATION</h3>
+      <p class="chart-desc">Monitors mechanical integrity and radiation. Rapid vibration spikes indicate turbine stress.</p>
+      <div class="chart-container"><canvas id="safetyChart"></canvas></div>
+    </div>
   </div>
   
   </div>
@@ -638,6 +741,25 @@
       // Update charts
       if (data.history && data.history.length > 0) {
         updateCharts(data.history);
+      }
+
+      // Update manual target displays
+      if (data.offsets) {
+        document.getElementById('tempTargetVal').textContent = data.offsets.tempTarget;
+        document.getElementById('pressTargetVal').textContent = data.offsets.pressureTarget;
+        document.getElementById('freqTargetVal').textContent = data.offsets.frequencyTarget;
+      }
+    }
+
+    function toggleSettings(id) {
+      document.getElementById(id).classList.toggle('active');
+    }
+
+    function updateOffset(key, val) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        let offsets = {};
+        offsets[key] = parseFloat(val);
+        ws.send(JSON.stringify({ offsets }));
       }
     }
 
