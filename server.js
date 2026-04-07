@@ -40,29 +40,30 @@ function startSimulation() {
   setInterval(() => {
     if (matlabClient) {
       // MATLAB is connected, skip internal physics. 
-      // MATLAB will send state updates via TCP, which we broadcast directly.
-      // But we still track history here to keep the graphs flowing.
+      state.source = 'MATLAB';
       state.timestamp = Date.now();
       state.history.push({
         time: state.timestamp,
-        temp: Math.round(state.reactor.temperature),
-        power: Math.round(state.generator.powerOutput || 0),
-        turbineSpeed: Math.round(state.turbine.speed || 0),
-        pressure: Math.round(state.reactor.pressure),
-        voltage: Math.round(state.generator.voltage || 0),
-        frequency: Math.round(state.generator.frequency || 50),
-        efficiency: Math.round(state.generator.efficiency || 0),
-        coolingPrimary: Math.round(state.cooling.primaryTemp || 0),
-        coolingSecondary: Math.round(state.cooling.secondaryTemp || 0),
-        flowRate: Math.round(state.cooling.flowRate || 15000),
-        vibration: Number(state.turbine.vibration || 0),
-        radiation: Number(state.safety.radiationLevel || 0),
-        load: Math.round(state.generator.load || 0)
+        temp: Number(state.reactor.temperature.toFixed(1)),
+        power: Number(state.generator.powerOutput || 0),
+        turbineSpeed: Number(state.turbine.speed || 0),
+        pressure: Number(state.reactor.pressure.toFixed(1)),
+        voltage: Number(state.generator.voltage || 0),
+        frequency: Number(state.generator.frequency.toFixed(2)),
+        efficiency: Number(state.generator.efficiency.toFixed(1)),
+        coolingPrimary: Number(state.cooling.primaryTemp.toFixed(1)),
+        coolingSecondary: Number(state.cooling.secondaryTemp.toFixed(1)),
+        flowRate: Number(state.cooling.flowRate || 15000),
+        vibration: Number(state.turbine.vibration.toFixed(2)),
+        radiation: Number(state.safety.radiationLevel.toFixed(2)),
+        load: Number(state.generator.load || 0)
       });
       if (state.history.length > 100) state.history.shift();
       broadcast(state);
       return;
     }
+
+    state.source = 'SIMULATOR';
 
     let controlRodFactor = (100 - state.reactor.controlRods) / 100;
     

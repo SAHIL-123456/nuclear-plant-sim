@@ -455,6 +455,7 @@
   <div class="header">
     <h1>⚛️ NUCLEAR POWER PLANT</h1>
     <p>Advanced Control & Monitoring System</p>
+    <div id="systemSource" style="display: inline-block; margin-top: 15px; padding: 5px 15px; border-radius: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0,255,136,0.5); font-weight: 700; color: #00ff88; font-size: 0.9em; letter-spacing: 1px;">🛰️ INITIALIZING...</div>
   </div>
 
   <div class="manual-section">
@@ -663,14 +664,28 @@
     function setMetric(id, newText) {
       const el = document.getElementById(id);
       if (!el) return;
+      // Force update if text is different
       if (el.textContent !== newText) {
         el.textContent = newText;
+        el.classList.remove('flash'); // Reset animation
+        void el.offsetWidth;         // Trigger reflow
         el.classList.add('flash');
-        setTimeout(() => el.classList.remove('flash'), 400);
       }
     }
 
     function updateDashboard(data) {
+      if (data.source) {
+        const sourceEl = document.getElementById('systemSource');
+        if (data.source === 'MATLAB') {
+          sourceEl.textContent = '💻 LIVE MATLAB BRIDGE';
+          sourceEl.style.borderColor = '#00ff88';
+          sourceEl.style.color = '#00ff88';
+        } else {
+          sourceEl.textContent = '🛰️ CLOUD SIMULATOR';
+          sourceEl.style.borderColor = '#00c8ff';
+          sourceEl.style.color = '#00c8ff';
+        }
+      }
       
       // Reactor
       if (data.reactor) {
