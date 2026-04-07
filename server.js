@@ -73,11 +73,11 @@ function startSimulation() {
     } else {
       // Aim for tempTarget using control rods and offsets
       const targetDiff = state.offsets.tempTarget - state.reactor.temperature;
-      state.reactor.temperature += (controlRodFactor * 5 - 2) + (targetDiff * 0.05) + (Math.random() - 0.5) * 2;
+      state.reactor.temperature += (controlRodFactor * 5 - 2) + (targetDiff * 0.05) + (Math.random() - 0.5) * 3;
       state.reactor.fuelLevel = Math.max(0, state.reactor.fuelLevel - 0.001);
     }
     state.reactor.temperature = Math.max(25, Math.min(600, state.reactor.temperature));
-    state.reactor.pressure = state.offsets.pressureTarget + (state.reactor.temperature - 300) * 0.5 + (Math.random() - 0.5);
+    state.reactor.pressure = state.offsets.pressureTarget + (state.reactor.temperature - 300) * 0.5 + (Math.random() - 0.5) * 3;
     
     // Turbine
     let steamFactor = state.reactor.pressure / 155;
@@ -85,9 +85,9 @@ function startSimulation() {
       steamFactor = 0;
       state.turbine.speed = Math.floor(state.turbine.speed * 0.90); // Spool down
     } else {
-      state.turbine.speed = Math.floor(1500 + steamFactor * 300);
+      state.turbine.speed = Math.floor(1500 + steamFactor * 300 + (Math.random() - 0.5) * 20);
     }
-    state.turbine.steamPressure = 60 + (state.reactor.temperature - 300) * 0.2;
+    state.turbine.steamPressure = 60 + (state.reactor.temperature - 300) * 0.2 + (Math.random() - 0.5) * 2;
     state.turbine.vibration = state.systemActive.turbine ? (0.3 + Math.random() * 0.4 + (state.turbine.speed > 1900 ? 0.5 : 0)) : 0;
     
     // Generator simulation
@@ -100,10 +100,10 @@ function startSimulation() {
       state.generator.voltage = 0;
       state.generator.efficiency = 0;
     } else {
-      state.generator.powerOutput = Math.round(tempFactor * state.turbine.speed * 0.6 * loadFactor);
-      state.generator.voltage = 24000 + state.generator.powerOutput * 2;
-      state.generator.frequency = state.offsets.frequencyTarget - (loadFactor * 0.5) + Math.random() * 0.5;
-      state.generator.efficiency = Math.min(98, 85 + tempFactor * 10 - (Math.abs(loadFactor - 0.8) * 5));
+      state.generator.powerOutput = Math.round(tempFactor * state.turbine.speed * 0.6 * loadFactor + (Math.random() - 0.5) * 5);
+      state.generator.voltage = 24000 + state.generator.powerOutput * 2 + Math.round((Math.random() - 0.5) * 40);
+      state.generator.frequency = state.offsets.frequencyTarget - (loadFactor * 0.5) + (Math.random() - 0.5) * 0.8;
+      state.generator.efficiency = Math.min(98, 85 + tempFactor * 10 - (Math.abs(loadFactor - 0.8) * 5) + (Math.random() - 0.5) * 1.5);
     }
     
     // Cooling system
@@ -116,8 +116,8 @@ function startSimulation() {
     } else {
       state.cooling.pumpStatus = 'OPERATIONAL';
     }
-    state.cooling.primaryTemp = state.reactor.temperature - 10;
-    state.cooling.secondaryTemp = 30 + (state.cooling.primaryTemp - 280) * 0.1 / coolingEfficiency;
+    state.cooling.primaryTemp = state.reactor.temperature - 10 + (Math.random() - 0.5) * 2;
+    state.cooling.secondaryTemp = 30 + (state.cooling.primaryTemp - 280) * 0.1 / coolingEfficiency + (Math.random() - 0.5) * 1.5;
     
     // Safety checks
     state.safety.radiationLevel = 0.05 + Math.max(0, state.reactor.temperature - 300) * 0.001;
