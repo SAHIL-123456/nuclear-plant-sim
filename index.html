@@ -242,6 +242,12 @@
       font-weight: 700;
       font-size: 1.4em;
       text-shadow: 0 0 10px rgba(0,255,136,0.5);
+      transition: color 0.3s ease;
+    }
+    
+    .metric-value.flash {
+      color: #00ff88;
+      text-shadow: 0 0 15px rgba(0,255,136,0.8);
     }
     
     .status-badge {
@@ -648,15 +654,25 @@
       };
     }
 
+    // Helper: update a metric value with a visual flash if it changed
+    function setMetric(id, newText) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.textContent !== newText) {
+        el.textContent = newText;
+        el.classList.add('flash');
+        setTimeout(() => el.classList.remove('flash'), 400);
+      }
+    }
+
     function updateDashboard(data) {
-      console.log('Updating dashboard with data:', data);
       
       // Reactor
       if (data.reactor) {
-        document.getElementById('reactorTemp').textContent = Math.round(data.reactor.temperature) + '°C';
-        document.getElementById('reactorPressure').textContent = Math.round(data.reactor.pressure) + ' bar';
-        document.getElementById('reactorRods').textContent = data.reactor.controlRods + '%';
-        document.getElementById('fuelLevel').textContent = data.reactor.fuelLevel.toFixed(2) + '%';
+        setMetric('reactorTemp', data.reactor.temperature.toFixed(1) + '°C');
+        setMetric('reactorPressure', data.reactor.pressure.toFixed(1) + ' bar');
+        setMetric('reactorRods', data.reactor.controlRods + '%');
+        setMetric('fuelLevel', data.reactor.fuelLevel.toFixed(2) + '%');
         updateStatus('reactorStatus', data.reactor.status);
       }
 
@@ -687,26 +703,26 @@
 
       // Generator
       if (data.generator) {
-        document.getElementById('powerOutput').textContent = data.generator.powerOutput + ' MW';
-        document.getElementById('generatorLoadDisplay').textContent = data.generator.load + '%';
-        document.getElementById('voltage').textContent = data.generator.voltage + ' V';
-        document.getElementById('frequency').textContent = data.generator.frequency.toFixed(2) + ' Hz';
-        document.getElementById('efficiency').textContent = data.generator.efficiency.toFixed(1) + '%';
+        setMetric('powerOutput', data.generator.powerOutput + ' MW');
+        setMetric('generatorLoadDisplay', data.generator.load + '%');
+        setMetric('voltage', data.generator.voltage + ' V');
+        setMetric('frequency', data.generator.frequency.toFixed(2) + ' Hz');
+        setMetric('efficiency', data.generator.efficiency.toFixed(1) + '%');
       }
 
       // Cooling
       if (data.cooling) {
-        document.getElementById('primaryTemp').textContent = Math.round(data.cooling.primaryTemp) + '°C';
-        document.getElementById('secondaryTemp').textContent = Math.round(data.cooling.secondaryTemp) + '°C';
-        document.getElementById('coolingFlow').textContent = data.cooling.flowRate + ' L/min';
-        document.getElementById('pumpStatus').textContent = data.cooling.pumpStatus.toUpperCase();
+        setMetric('primaryTemp', data.cooling.primaryTemp.toFixed(1) + '°C');
+        setMetric('secondaryTemp', data.cooling.secondaryTemp.toFixed(1) + '°C');
+        setMetric('coolingFlow', data.cooling.flowRate + ' L/min');
+        setMetric('pumpStatus', data.cooling.pumpStatus.toUpperCase());
       }
 
       // Turbine
       if (data.turbine) {
-        document.getElementById('turbineSpeed').textContent = data.turbine.speed + ' RPM';
-        document.getElementById('steamPressure').textContent = Math.round(data.turbine.steamPressure) + ' bar';
-        document.getElementById('vibration').textContent = data.turbine.vibration.toFixed(2) + ' mm/s';
+        setMetric('turbineSpeed', data.turbine.speed + ' RPM');
+        setMetric('steamPressure', data.turbine.steamPressure.toFixed(1) + ' bar');
+        setMetric('vibration', data.turbine.vibration.toFixed(2) + ' mm/s');
         updateStatus('turbineStatus', data.turbine.status);
       }
 
