@@ -71,9 +71,10 @@ function startSimulation() {
       controlRodFactor = 0;
       if (state.reactor.temperature > 40) state.reactor.temperature -= 4; // Cool down if off
     } else {
-      // Aim for tempTarget using control rods and offsets
-      const targetDiff = state.offsets.tempTarget - state.reactor.temperature;
-      state.reactor.temperature += (controlRodFactor * 5 - 2) + (targetDiff * 0.05) + (Math.random() - 0.5) * 3;
+      // Manual control: rods (0=cool, 100=max heat) with strong noise
+      // 50% rods is roughly steady state. Below 50 = cool, Above 50 = heat.
+      const rodPower = (controlRodFactor * 10 - 5.0); 
+      state.reactor.temperature += rodPower + (Math.random() - 0.5) * 3;
       state.reactor.fuelLevel = Math.max(0, state.reactor.fuelLevel - 0.001);
     }
     state.reactor.temperature = Math.max(25, Math.min(600, state.reactor.temperature));
@@ -161,24 +162,24 @@ function startSimulation() {
     // Store history (last 100 points)
     state.history.push({
       time: state.timestamp,
-      temp: Math.round(state.reactor.temperature),
-      power: state.generator.powerOutput,
-      turbineSpeed: state.turbine.speed,
-      pressure: Math.round(state.reactor.pressure),
-      voltage: state.generator.voltage,
-      frequency: state.generator.frequency,
-      efficiency: state.generator.efficiency,
-      coolingPrimary: state.cooling.primaryTemp,
-      coolingSecondary: state.cooling.secondaryTemp,
-      flowRate: state.cooling.flowRate,
-      vibration: state.turbine.vibration,
-      radiation: state.safety.radiationLevel,
-      load: state.generator.load
+      temp: Number(state.reactor.temperature.toFixed(1)),
+      power: Number(state.generator.powerOutput || 0),
+      turbineSpeed: Number(state.turbine.speed || 0),
+      pressure: Number(state.reactor.pressure.toFixed(1)),
+      voltage: Number(state.generator.voltage || 0),
+      frequency: Number(state.generator.frequency.toFixed(2)),
+      efficiency: Number(state.generator.efficiency.toFixed(1)),
+      coolingPrimary: Number(state.cooling.primaryTemp.toFixed(1)),
+      coolingSecondary: Number(state.cooling.secondaryTemp.toFixed(1)),
+      flowRate: Number(state.cooling.flowRate || 0),
+      vibration: Number(state.turbine.vibration.toFixed(2)),
+      radiation: Number(state.safety.radiationLevel.toFixed(2)),
+      load: Number(state.generator.load || 0)
     });
     if (state.history.length > 100) state.history.shift();
     
     broadcast(state);
-  }, 1000);
+  }, 500);
 }
 
 function handleControl(data) {

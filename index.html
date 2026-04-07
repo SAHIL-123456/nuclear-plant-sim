@@ -599,6 +599,11 @@
     let ws;
     let forceDisconnect = false;
     let tempData = [], powerData = [], turbineData = [], pressureData = [], labels = [];
+    
+    // Interaction flags to prevent server updates from overwriting user input
+    let isDraggingRods = false;
+    let isDraggingFlow = false;
+    let isDraggingLoad = false;
 
     function toggleModule(sys) {
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -676,23 +681,23 @@
         updateStatus('reactorStatus', data.reactor.status);
       }
 
-      // Update sliders from server (multi-user sync)
+      // Update sliders from server (multi-user sync) - ONLY if user is not actively dragging
       const controlRodsSlider = document.getElementById('controlRods');
       const flowRateSlider = document.getElementById('flowRate');
       const generatorLoadSlider = document.getElementById('generatorLoad');
       const autoShutdownCheckbox = document.getElementById('autoShutdown');
       
-      if (data.reactor && controlRodsSlider.value != data.reactor.controlRods) {
+      if (data.reactor && !isDraggingRods) {
         controlRodsSlider.value = data.reactor.controlRods;
         document.getElementById('rodValue').textContent = data.reactor.controlRods;
       }
       
-      if (data.cooling && flowRateSlider.value != data.cooling.flowRate) {
+      if (data.cooling && !isDraggingFlow) {
         flowRateSlider.value = data.cooling.flowRate;
         document.getElementById('flowValue').textContent = data.cooling.flowRate;
       }
       
-      if (data.generator && generatorLoadSlider.value != data.generator.load) {
+      if (data.generator && !isDraggingLoad) {
         generatorLoadSlider.value = data.generator.load;
         document.getElementById('loadValue').textContent = data.generator.load;
       }
@@ -965,6 +970,10 @@
       });
     }
 
+    document.getElementById('controlRods').addEventListener('mousedown', () => isDraggingRods = true);
+    document.getElementById('controlRods').addEventListener('mouseup', () => isDraggingRods = false);
+    document.getElementById('controlRods').addEventListener('touchstart', () => isDraggingRods = true);
+    document.getElementById('controlRods').addEventListener('touchend', () => isDraggingRods = false);
     document.getElementById('controlRods').addEventListener('input', (e) => {
       document.getElementById('rodValue').textContent = e.target.value;
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -972,6 +981,10 @@
       }
     });
 
+    document.getElementById('flowRate').addEventListener('mousedown', () => isDraggingFlow = true);
+    document.getElementById('flowRate').addEventListener('mouseup', () => isDraggingFlow = false);
+    document.getElementById('flowRate').addEventListener('touchstart', () => isDraggingFlow = true);
+    document.getElementById('flowRate').addEventListener('touchend', () => isDraggingFlow = false);
     document.getElementById('flowRate').addEventListener('input', (e) => {
       document.getElementById('flowValue').textContent = e.target.value;
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -979,6 +992,10 @@
       }
     });
 
+    document.getElementById('generatorLoad').addEventListener('mousedown', () => isDraggingLoad = true);
+    document.getElementById('generatorLoad').addEventListener('mouseup', () => isDraggingLoad = false);
+    document.getElementById('generatorLoad').addEventListener('touchstart', () => isDraggingLoad = true);
+    document.getElementById('generatorLoad').addEventListener('touchend', () => isDraggingLoad = false);
     document.getElementById('generatorLoad').addEventListener('input', (e) => {
       document.getElementById('loadValue').textContent = e.target.value;
       if (ws && ws.readyState === WebSocket.OPEN) {
