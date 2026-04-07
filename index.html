@@ -817,42 +817,136 @@
     function drawChart(canvasId, datasets) {
       const canvas = document.getElementById(canvasId);
       const ctx = canvas.getContext('2d');
-      const width = canvas.width = canvas.offsetWidth;
-      const height = canvas.height = canvas.offsetHeight;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      const width = rect.width;
+      const height = rect.height;
       
       ctx.clearRect(0, 0, width, height);
       
-      const padding = 40;
-      const chartWidth = width - padding * 2;
-      const chartHeight = height - padding * 2;
+      const paddingLeft = 70;
+      const paddingRight = 120;
+      const paddingTop = 45;
+      const paddingBottom = 35;
+      const chartWidth = width - paddingLeft - paddingRight;
+      const chartHeight = height - paddingTop - paddingBottom;
       
-      datasets.forEach(dataset => {
-        const max = Math.max(...dataset.data, 1);
-        const min = Math.min(...dataset.data, 0);
-        const range = max - min || 1;
+      // Compute global min/max across all datasets for shared Y axis
+      let globalMin = Infinity, globalMax = -Infinity;
+      datasets.forEach(ds => {
+        ds.data.forEach(v => { if (v < globalMin) globalMin = v; if (v > globalMax) globalMax = v; });
+      });
+      // Add 10% padding to range
+      const rangePad = (globalMax - globalMin) * 0.1 || 1;
+      globalMin = globalMin - rangePad;
+      globalMax = globalMax + rangePad;
+      const range = globalMax - globalMin || 1;
+      
+      // --- Draw Grid ---
+      const gridLines = 5;
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#667788';
+      ctx.font = '11px Rajdhani, sans-serif';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= gridLines; i++) {
+        const y = paddingTop + (i / gridLines) * chartHeight;
+        const val = globalMax - (i / gridLines) * range;
+        // Horizontal grid line
+        ctx.beginPath();
+        ctx.moveTo(paddingLeft, y);
+        ctx.lineTo(paddingLeft + chartWidth, y);
+        ctx.stroke();
+        // Y-axis label
+        ctx.fillText(val.toFixed(1), paddingLeft - 8, y + 4);
+      }
+      // X-axis time labels
+      ctx.textAlign = 'center';
+      const totalPoints = datasets[0] ? datasets[0].data.length : 0;
+      const xTicks = Math.min(6, totalPoints);
+      for (let i = 0; i < xTicks; i++) {
+        const idx = Math.round((i / (xTicks - 1)) * (totalPoints - 1));
+        const x = paddingLeft + (idx / Math.max(totalPoints - 1, 1)) * chartWidth;
+        ctx.fillText(idx + 's', x, paddingTop + chartHeight + 20);
+      }
+      
+      // --- Draw Border ---
+      ctx.strokeStyle = 'rgba(0,200,255,0.25)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(paddingLeft, paddingTop, chartWidth, chartHeight);
+      
+      // --- Draw Datasets ---
+      datasets.forEach((dataset, dsIdx) => {
+        if (!dataset.data || dataset.data.length < 2) return;
+        const len = dataset.data.length;
         
+        // Smooth line
         ctx.strokeStyle = dataset.color;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
         ctx.beginPath();
         
+        const points = [];
         dataset.data.forEach((value, i) => {
-          const x = padding + (i / (dataset.data.length - 1)) * chartWidth;
-          const y = padding + chartHeight - ((value - min) / range) * chartHeight;
-          
+          const x = paddingLeft + (i / (len - 1)) * chartWidth;
+          const y = paddingTop + chartHeight - ((value - globalMin) / range) * chartHeight;
+          points.push({x, y});
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         });
-        
         ctx.stroke();
         
+        // Gradient fill under the line
+        const grad = ctx.createLinearGradient(0, paddingTop, 0, paddingTop + chartHeight);
+        grad.addColorStop(0, dataset.color.replace(')', ',0.25)').replace('rgb', 'rgba'));
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        points.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+        ctx.lineTo(points[points.length-1].x, paddingTop + chartHeight);
+        ctx.lineTo(points[0].x, paddingTop + chartHeight);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Dot + numeric value on the latest data point
+        const lastPt = points[points.length - 1];
+        const lastVal = dataset.data[len - 1];
+        ctx.beginPath();
+        ctx.arc(lastPt.x, lastPt.y, 5, 0, Math.PI * 2);
         ctx.fillStyle = dataset.color;
-        ctx.font = '12px Arial';
-        ctx.fillText(dataset.label, padding, padding - 20 + datasets.indexOf(dataset) * 15);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Glow ring around last point
+        ctx.beginPath();
+        ctx.arc(lastPt.x, lastPt.y, 9, 0, Math.PI * 2);
+        ctx.strokeStyle = dataset.color + '66';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // --- Legend + Latest Value on the right ---
+        const legendY = paddingTop + 20 + dsIdx * 42;
+        const legendX = paddingLeft + chartWidth + 12;
+        // Color dot
+        ctx.beginPath();
+        ctx.arc(legendX + 6, legendY, 5, 0, Math.PI * 2);
+        ctx.fillStyle = dataset.color;
+        ctx.fill();
+        // Label
+        ctx.fillStyle = '#aabbcc';
+        ctx.font = '11px Rajdhani, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(dataset.label, legendX + 16, legendY + 4);
+        // Large numeric value
+        ctx.fillStyle = dataset.color;
+        ctx.font = 'bold 16px Orbitron, sans-serif';
+        ctx.fillText(lastVal.toFixed(1), legendX + 16, legendY + 22);
       });
-      
-      ctx.strokeStyle = '#444';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(padding, padding, chartWidth, chartHeight);
     }
 
     document.getElementById('controlRods').addEventListener('input', (e) => {

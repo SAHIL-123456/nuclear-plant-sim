@@ -1,6 +1,7 @@
 const express = require('express');
 const { WebSocketServer } = require('ws');
 const http = require('http');
+const net = require('net');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,6 +12,7 @@ app.use(express.json());
 // Basic state holder
 let state = getInitialState();
 let simulationRunning = false;
+let matlabClient = null;
 
 function getInitialState() {
   return {
@@ -36,6 +38,32 @@ function startSimulation() {
   simulationRunning = true;
   
   setInterval(() => {
+    if (matlabClient) {
+      // MATLAB is connected, skip internal physics. 
+      // MATLAB will send state updates via TCP, which we broadcast directly.
+      // But we still track history here to keep the graphs flowing.
+      state.timestamp = Date.now();
+      state.history.push({
+        time: state.timestamp,
+        temp: Math.round(state.reactor.temperature),
+        power: Math.round(state.generator.powerOutput || 0),
+        turbineSpeed: Math.round(state.turbine.speed || 0),
+        pressure: Math.round(state.reactor.pressure),
+        voltage: Math.round(state.generator.voltage || 0),
+        frequency: Math.round(state.generator.frequency || 50),
+        efficiency: Math.round(state.generator.efficiency || 0),
+        coolingPrimary: Math.round(state.cooling.primaryTemp || 0),
+        coolingSecondary: Math.round(state.cooling.secondaryTemp || 0),
+        flowRate: Math.round(state.cooling.flowRate || 15000),
+        vibration: Number(state.turbine.vibration || 0),
+        radiation: Number(state.safety.radiationLevel || 0),
+        load: Math.round(state.generator.load || 0)
+      });
+      if (state.history.length > 100) state.history.shift();
+      broadcast(state);
+      return;
+    }
+
     let controlRodFactor = (100 - state.reactor.controlRods) / 100;
     
     // Reactor simulation
@@ -181,6 +209,17 @@ function handleControl(data) {
     state = getInitialState();
     state.history = []; // Explicitly clear history
   }
+
+  // Forward controls to MATLAB if connected
+  if (matlabClient) {
+    try {
+      // ensure we only send a single line of JSON
+      matlabClient.write(JSON.stringify(data) + '\n');
+    } catch(e) {
+      console.error('Error sending control to MATLAB:', e);
+    }
+  }
+
   broadcast(state);
 }
 
@@ -220,6 +259,57 @@ app.get('/', (req, res) => {
 });
 
 startSimulation();
+
+// --- MATLAB TCP BRIDGE ---
+const TCP_PORT = 3001;
+const tcpServer = net.createServer((socket) => {
+  console.log('MATLAB connected via TCP');
+  matlabClient = socket;
+
+  let buffer = '';
+  socket.on('data', (data) => {
+    buffer += data.toString();
+    let parts = buffer.split('\n');
+    buffer = parts.pop(); // Keep incomplete part in buffer
+    
+    for (let part of parts) {
+      if (part.trim() === '') continue;
+      try {
+        const matlabData = JSON.parse(part);
+        // Map MATLAB data to server state deep merge
+        mergeState(state, matlabData);
+      } catch (e) {
+        console.error('Error parsing MATLAB data:', e.message);
+      }
+    }
+  });
+
+  socket.on('end', () => {
+    console.log('MATLAB disconnected');
+    matlabClient = null;
+  });
+
+  socket.on('error', (err) => {
+    console.error('MATLAB socket error:', err);
+    matlabClient = null;
+  });
+});
+
+tcpServer.listen(TCP_PORT, () => {
+  console.log(`MATLAB TCP Bridge listening on port ${TCP_PORT}`);
+});
+
+// Helper function to deep merge MATLAB state into JS state
+function mergeState(target, source) {
+  for (const key in source) {
+    if (source[key] instanceof Object && !Array.isArray(source[key])) {
+      if (!target[key]) Object.assign(target, { [key]: {} });
+      mergeState(target[key], source[key]);
+    } else {
+      Object.assign(target, { [key]: source[key] });
+    }
+  }
+}
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
