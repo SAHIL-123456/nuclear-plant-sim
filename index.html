@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nuclear Power Plant Control System</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap"
+    rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Rajdhani', sans-serif;
       background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
@@ -15,39 +22,79 @@
       overflow-x: hidden;
       min-height: 100vh;
     }
-    
-    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-    .star { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
-    @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-    
-    .container { position: relative; z-index: 1; max-width: 1920px; margin: 0 auto; padding: 20px; }
-    
+
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+
+      0%,
+      100% {
+        opacity: 0.3;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1920px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
     .header {
       text-align: center;
       margin-bottom: 40px;
       padding: 30px;
-      background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,200,255,0.1) 100%);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 200, 255, 0.1) 100%);
       border-radius: 20px;
-      border: 2px solid rgba(0,255,136,0.3);
-      box-shadow: 0 0 40px rgba(0,255,136,0.2), inset 0 0 40px rgba(0,255,136,0.05);
+      border: 2px solid rgba(0, 255, 136, 0.3);
+      box-shadow: 0 0 40px rgba(0, 255, 136, 0.2), inset 0 0 40px rgba(0, 255, 136, 0.05);
       position: relative;
       overflow: hidden;
     }
-    
+
     .header::before {
       content: '';
       position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(0,255,136,0.1), transparent);
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(0, 255, 136, 0.1), transparent);
       animation: scan 4s linear infinite;
     }
-    
+
     @keyframes scan {
-      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+      0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+      }
+
+      100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+      }
     }
-    
+
     .header h1 {
       font-family: 'Orbitron', sans-serif;
       font-size: 3.5em;
@@ -55,15 +102,24 @@
       background: linear-gradient(90deg, #00ff88, #00c8ff, #00ff88);
       background-size: 200% auto;
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: gradient 3s linear infinite;
-      text-shadow: 0 0 30px rgba(0,255,136,0.5);
+      text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
       position: relative;
       z-index: 1;
     }
-    
-    @keyframes gradient { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
-    
+
+    @keyframes gradient {
+      0% {
+        background-position: 0% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
     .header p {
       font-size: 1.3em;
       color: #00c8ff;
@@ -73,7 +129,7 @@
       position: relative;
       z-index: 1;
     }
-    
+
     .connection-status {
       position: fixed;
       top: 30px;
@@ -83,54 +139,84 @@
       font-weight: 700;
       font-size: 1.1em;
       z-index: 1000;
-      box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(10px);
       border: 2px solid;
       animation: statusPulse 2s infinite;
       cursor: pointer;
     }
-    
-    @keyframes statusPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-    
+
+    @keyframes statusPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
     .connection-status.connected {
       background: linear-gradient(135deg, #00ff88, #00cc6a);
       color: #000;
       border-color: #00ff88;
-      box-shadow: 0 5px 30px rgba(0,255,136,0.5);
+      box-shadow: 0 5px 30px rgba(0, 255, 136, 0.5);
     }
-    
+
     .connection-status.disconnected {
       background: linear-gradient(135deg, #ff4444, #cc0000);
       color: #fff;
       border-color: #ff4444;
-      box-shadow: 0 5px 30px rgba(255,68,68,0.5);
+      box-shadow: 0 5px 30px rgba(255, 68, 68, 0.5);
       animation: errorBlink 1s infinite;
     }
-    
-    @keyframes errorBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-    
+
+    @keyframes errorBlink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.7;
+      }
+    }
+
     .control-panel {
       background: linear-gradient(135deg, #0f1923 0%, #1a2332 100%);
       border-radius: 20px;
       padding: 30px;
-      border: 2px solid rgba(0,255,136,0.3);
-      box-shadow: 0 10px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      border: 2px solid rgba(0, 255, 136, 0.3);
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       margin-bottom: 30px;
       position: relative;
       overflow: hidden;
     }
-    
+
     .control-panel::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 3px;
       background: linear-gradient(90deg, transparent, #00ff88, transparent);
       animation: topGlow 2s linear infinite;
     }
-    
-    @keyframes topGlow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-    
+
+    @keyframes topGlow {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
     .manual-section {
       background: rgba(0, 255, 136, 0.05);
       border: 1px solid rgba(0, 255, 136, 0.2);
@@ -140,7 +226,7 @@
       font-size: 1.1em;
       line-height: 1.6;
     }
-    
+
     .manual-section h3 {
       color: #00ff88;
       font-family: 'Orbitron', sans-serif;
@@ -159,9 +245,11 @@
       border-radius: 10px;
       padding: 10px;
     }
-    
-    .settings-panel.active { display: block; }
-    
+
+    .settings-panel.active {
+      display: block;
+    }
+
     .settings-btn {
       background: rgba(0, 255, 136, 0.1);
       border: 1px solid rgba(0, 255, 136, 0.3);
@@ -174,8 +262,10 @@
       width: 100%;
       transition: all 0.3s;
     }
-    
-    .settings-btn:hover { background: rgba(0, 255, 136, 0.2); }
+
+    .settings-btn:hover {
+      background: rgba(0, 255, 136, 0.2);
+    }
 
     .chart-desc {
       font-size: 0.9em;
@@ -188,17 +278,17 @@
       background: linear-gradient(135deg, #0f1923 0%, #1a2332 100%);
       border-radius: 20px;
       padding: 25px;
-      border: 2px solid rgba(0,200,255,0.3);
-      box-shadow: 0 10px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      border: 2px solid rgba(0, 200, 255, 0.3);
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       transition: all 0.3s ease;
     }
-    
+
     .card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 15px 60px rgba(0,200,255,0.3);
-      border-color: rgba(0,200,255,0.6);
+      box-shadow: 0 15px 60px rgba(0, 200, 255, 0.3);
+      border-color: rgba(0, 200, 255, 0.6);
     }
-    
+
     .card h2 {
       font-family: 'Orbitron', sans-serif;
       font-size: 1.5em;
@@ -208,26 +298,26 @@
       letter-spacing: 2px;
       margin-bottom: 20px;
       padding-bottom: 15px;
-      border-bottom: 2px solid rgba(0,255,136,0.3);
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
     }
-    
+
     .metric {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 15px;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0, 0, 0, 0.3);
       border-radius: 10px;
       border-left: 4px solid #00c8ff;
       margin: 12px 0;
       transition: all 0.3s ease;
     }
-    
+
     .metric:hover {
-      background: rgba(0,200,255,0.1);
+      background: rgba(0, 200, 255, 0.1);
       transform: translateX(5px);
     }
-    
+
     .metric-label {
       color: #8899aa;
       font-size: 1.1em;
@@ -235,21 +325,21 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    
+
     .metric-value {
       color: #fff;
       font-family: 'Orbitron', sans-serif;
       font-weight: 700;
       font-size: 1.4em;
-      text-shadow: 0 0 10px rgba(0,255,136,0.5);
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
       transition: color 0.3s ease;
     }
-    
+
     .metric-value.flash {
       color: #00ff88;
-      text-shadow: 0 0 15px rgba(0,255,136,0.8);
+      text-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
     }
-    
+
     .status-badge {
       display: inline-block;
       padding: 8px 20px;
@@ -258,36 +348,66 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
       animation: badgePulse 2s infinite;
     }
-    
-    @keyframes badgePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-    
+
+    @keyframes badgePulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
     .status-badge.stable {
       background: linear-gradient(135deg, #00ff88, #00cc6a);
       color: #000;
-      box-shadow: 0 5px 20px rgba(0,255,136,0.5);
+      box-shadow: 0 5px 20px rgba(0, 255, 136, 0.5);
     }
-    
+
     .status-badge.warning {
       background: linear-gradient(135deg, #ffa500, #ff8c00);
       color: #000;
-      box-shadow: 0 5px 20px rgba(255,165,0,0.5);
+      box-shadow: 0 5px 20px rgba(255, 165, 0, 0.5);
       animation: warningPulse 1s infinite;
     }
-    
-    @keyframes warningPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
-    
+
+    @keyframes warningPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.8;
+      }
+    }
+
     .status-badge.critical {
       background: linear-gradient(135deg, #ff4444, #cc0000);
       color: #fff;
-      box-shadow: 0 5px 20px rgba(255,68,68,0.5);
+      box-shadow: 0 5px 20px rgba(255, 68, 68, 0.5);
       animation: criticalBlink 0.5s infinite;
     }
-    
-    @keyframes criticalBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    
+
+    @keyframes criticalBlink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
     .module-toggle {
       float: right;
       padding: 5px 15px;
@@ -299,27 +419,29 @@
       font-weight: 700;
       text-transform: uppercase;
       margin-top: -5px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
       transition: all 0.3s ease;
     }
+
     .module-toggle.on {
       background: linear-gradient(135deg, #00ff88, #00cc6a);
-      box-shadow: 0 5px 20px rgba(0,255,136,0.5);
+      box-shadow: 0 5px 20px rgba(0, 255, 136, 0.5);
     }
+
     .module-toggle.off {
       background: linear-gradient(135deg, #ff4444, #cc0000);
       color: #fff;
-      box-shadow: 0 5px 20px rgba(255,68,68,0.5);
+      box-shadow: 0 5px 20px rgba(255, 68, 68, 0.5);
     }
-    
+
     .control-group {
       margin: 20px 0;
       padding: 20px;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0, 0, 0, 0.3);
       border-radius: 15px;
-      border: 1px solid rgba(0,255,136,0.2);
+      border: 1px solid rgba(0, 255, 136, 0.2);
     }
-    
+
     .control-group label {
       display: block;
       margin-bottom: 15px;
@@ -329,18 +451,18 @@
       text-transform: uppercase;
       letter-spacing: 2px;
     }
-    
+
     input[type="range"] {
       width: 100%;
       height: 10px;
       border-radius: 5px;
       background: linear-gradient(90deg, #1a2332, #2a3342);
       outline: none;
-      border: 1px solid rgba(0,255,136,0.3);
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
       cursor: pointer;
     }
-    
+
     input[type="range"]::-webkit-slider-thumb {
       appearance: none;
       width: 25px;
@@ -348,15 +470,15 @@
       border-radius: 50%;
       background: linear-gradient(135deg, #00ff88, #00c8ff);
       cursor: pointer;
-      box-shadow: 0 0 20px rgba(0,255,136,0.8), 0 5px 15px rgba(0,0,0,0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 5px 15px rgba(0, 0, 0, 0.5);
       transition: all 0.3s ease;
     }
-    
+
     input[type="range"]::-webkit-slider-thumb:hover {
       transform: scale(1.2);
-      box-shadow: 0 0 30px rgba(0,255,136,1), 0 5px 20px rgba(0,0,0,0.7);
+      box-shadow: 0 0 30px rgba(0, 255, 136, 1), 0 5px 20px rgba(0, 0, 0, 0.7);
     }
-    
+
     input[type="checkbox"] {
       width: 20px;
       height: 20px;
@@ -364,7 +486,7 @@
       cursor: pointer;
       accent-color: #00ff88;
     }
-    
+
     button {
       background: linear-gradient(135deg, #00ff88, #00cc6a);
       color: #000;
@@ -377,51 +499,66 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       transition: all 0.3s ease;
-      box-shadow: 0 5px 20px rgba(0,255,136,0.3);
+      box-shadow: 0 5px 20px rgba(0, 255, 136, 0.3);
       margin: 5px;
     }
-    
+
     button:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(0,255,136,0.5);
+      box-shadow: 0 8px 30px rgba(0, 255, 136, 0.5);
     }
-    
+
     button.danger {
       background: linear-gradient(135deg, #ff4444, #cc0000);
       color: #fff;
-      box-shadow: 0 5px 20px rgba(255,68,68,0.3);
+      box-shadow: 0 5px 20px rgba(255, 68, 68, 0.3);
     }
-    
+
     button.danger:hover {
-      box-shadow: 0 8px 30px rgba(255,68,68,0.5);
+      box-shadow: 0 8px 30px rgba(255, 68, 68, 0.5);
     }
-    
+
     button.emergency {
       background: linear-gradient(135deg, #ffa500, #ff8c00);
       color: #000;
-      box-shadow: 0 5px 20px rgba(255,165,0,0.3);
+      box-shadow: 0 5px 20px rgba(255, 165, 0, 0.3);
       animation: emergencyGlow 2s infinite;
     }
-    
+
     @keyframes emergencyGlow {
-      0%, 100% { box-shadow: 0 5px 20px rgba(255,165,0,0.3); }
-      50% { box-shadow: 0 5px 30px rgba(255,165,0,0.8); }
+
+      0%,
+      100% {
+        box-shadow: 0 5px 20px rgba(255, 165, 0, 0.3);
+      }
+
+      50% {
+        box-shadow: 0 5px 30px rgba(255, 165, 0, 0.8);
+      }
     }
-    
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 30px; }
-    
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
     .chart-container {
-      background: rgba(0,0,0,0.4);
+      background: rgba(0, 0, 0, 0.4);
       border-radius: 15px;
       padding: 20px;
       margin-top: 20px;
       height: 300px;
-      border: 1px solid rgba(0,200,255,0.3);
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+      border: 1px solid rgba(0, 200, 255, 0.3);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
     }
-    
-    canvas { width: 100% !important; height: 100% !important; }
-    
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
     .alarm {
       background: linear-gradient(135deg, #ff4444, #cc0000);
       color: #fff;
@@ -430,159 +567,220 @@
       margin: 10px 0;
       font-weight: 700;
       font-size: 1.1em;
-      box-shadow: 0 5px 20px rgba(255,68,68,0.5);
+      box-shadow: 0 5px 20px rgba(255, 68, 68, 0.5);
       animation: alarmPulse 1s infinite;
       border-left: 5px solid #fff;
     }
-    
+
     @keyframes alarmPulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.02); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+      }
     }
-    
+
     @media (max-width: 768px) {
-      .header h1 { font-size: 2em; }
-      .header p { font-size: 1em; }
-      .connection-status { top: 10px; right: 10px; padding: 10px 20px; font-size: 0.9em; }
+      .header h1 {
+        font-size: 2em;
+      }
+
+      .header p {
+        font-size: 1em;
+      }
+
+      .connection-status {
+        top: 10px;
+        right: 10px;
+        padding: 10px 20px;
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="stars" id="stars"></div>
   <div class="container">
-  <div class="connection-status" id="connectionStatus" onclick="toggleConnection()">● CONNECTING...</div>
-  
-  <div class="header">
-    <h1>⚛️ NUCLEAR POWER PLANT</h1>
-    <p>Advanced Control & Monitoring System</p>
-    <div id="systemSource" style="display: inline-block; margin-top: 15px; padding: 5px 15px; border-radius: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0,255,136,0.5); font-weight: 700; color: #00ff88; font-size: 0.9em; letter-spacing: 1px;">🛰️ INITIALIZING...</div>
-  </div>
+    <div class="connection-status" id="connectionStatus" onclick="toggleConnection()">● CONNECTING...</div>
 
-  <div class="manual-section">
-    <h3>📖 OPERATION MANUAL & NORMS</h3>
-    <p>Welcome, Operator. This dashboard provides real-time telemetry from the nuclear reactor. To maintain safety, follow these <strong>Basic Norms</strong>:</p>
-    <ul style="margin-left: 20px; margin-top: 10px; color: #8899aa;">
-      <li><strong>Stable Temperature:</strong> Keep the reactor core between 250°C and 450°C. Above 550°C is <strong>CRITICAL</strong>.</li>
-      <li><strong>Power Grid:</strong> Target 50.00 Hz frequency. Fluctuations indicate unstable load or turbine issues.</li>
-      <li><strong>Control Rods:</strong> Inserting rods (higher %) slows the nuclear reaction and drops temperature.</li>
-      <li><strong>Cooling:</strong> Ensure flow rate stays above 10,000 L/min to prevent rapid heat spikes.</li>
-    </ul>
-  </div>
+    <div class="header">
+      <h1>⚛️ NUCLEAR POWER PLANT</h1>
+      <p>Advanced Control & Monitoring System</p>
+      <div id="systemSource"
+        style="display: inline-block; margin-top: 15px; padding: 5px 15px; border-radius: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0,255,136,0.5); font-weight: 700; color: #00ff88; font-size: 0.9em; letter-spacing: 1px;">
+        🛰️ INITIALIZING...</div>
+    </div>
 
-  <div class="control-panel">
-    <h2 style="font-family: 'Orbitron', sans-serif; color: #00ff88; margin-bottom: 20px;">🎛️ CONTROL PANEL</h2>
-    <div class="control-group">
-      <label>Control Rods Position: <span id="rodValue" style="color: #00c8ff; font-family: 'Orbitron', sans-serif;">80</span>%</label>
-      <input type="range" id="controlRods" min="0" max="100" value="80">
+    <div class="manual-section">
+      <h3>📖 OPERATION MANUAL & NORMS</h3>
+      <p>Welcome, Operator. This dashboard provides real-time telemetry from the nuclear reactor. To maintain safety,
+        follow these <strong>Basic Norms</strong>:</p>
+      <ul style="margin-left: 20px; margin-top: 10px; color: #8899aa;">
+        <li><strong>Stable Temperature:</strong> Keep the reactor core between 250°C and 450°C. Above 550°C is
+          <strong>CRITICAL</strong>.</li>
+        <li><strong>Power Grid:</strong> Target 50.00 Hz frequency. Fluctuations indicate unstable load or turbine
+          issues.</li>
+        <li><strong>Control Rods:</strong> Inserting rods (higher %) slows the nuclear reaction and drops temperature.
+        </li>
+        <li><strong>Cooling:</strong> Ensure flow rate stays above 10,000 L/min to prevent rapid heat spikes.</li>
+      </ul>
     </div>
-    <div class="control-group">
-      <label>Cooling Flow Rate: <span id="flowValue" style="color: #00c8ff; font-family: 'Orbitron', sans-serif;">15000</span> L/min</label>
-      <input type="range" id="flowRate" min="5000" max="25000" value="15000" step="1000">
-    </div>
-    <div class="control-group">
-      <label>Generator Load: <span id="loadValue" style="color: #00c8ff; font-family: 'Orbitron', sans-serif;">70</span>%</label>
-      <input type="range" id="generatorLoad" min="0" max="100" value="70">
-    </div>
-    <div class="control-group">
-      <label><input type="checkbox" id="autoShutdown" checked> Auto Safety Shutdown System</label>
-    </div>
-    <div>
-      <button onclick="emergencyCooling()" class="emergency">🚨 EMERGENCY COOLING</button>
-      <button onclick="resetPlant()" class="danger">🔄 RESET PLANT</button>
-    </div>
-  </div>
 
-  <div class="grid">
-    <div class="card">
-      <h2>⚛️ REACTOR <button class="module-toggle on" id="toggle-reactor" onclick="toggleModule('reactor')">ON</button></h2>
-      <div class="metric"><span class="metric-label">Temperature:</span><span class="metric-value" id="reactorTemp">300°C</span></div>
-      <div class="metric"><span class="metric-label">Pressure:</span><span class="metric-value" id="reactorPressure">155 bar</span></div>
-      <div class="metric"><span class="metric-label">Control Rods:</span><span class="metric-value" id="reactorRods">80%</span></div>
-      <div class="metric"><span class="metric-label">Fuel Level:</span><span class="metric-value" id="fuelLevel">100%</span></div>
-      <div class="metric"><span class="metric-label">Status:</span><span class="status-badge stable" id="reactorStatus">STABLE</span></div>
-      
-      <button class="settings-btn" onclick="toggleSettings('reactor-settings')">⚙️ CUSTOM SETTINGS</button>
-      <div id="reactor-settings" class="settings-panel">
-        <label style="font-size: 0.8em; color: #00ff88;">Target Temp (°C): <span id="tempTargetVal">300</span></label>
-        <input type="range" min="100" max="600" value="300" oninput="updateOffset('tempTarget', this.value)">
-        <label style="font-size: 0.8em; color: #00ff88; margin-top: 10px; display: block;">Target Pressure (bar): <span id="pressTargetVal">155</span></label>
-        <input type="range" min="50" max="300" value="155" oninput="updateOffset('pressureTarget', this.value)">
+    <div class="control-panel">
+      <h2 style="font-family: 'Orbitron', sans-serif; color: #00ff88; margin-bottom: 20px;">🎛️ CONTROL PANEL</h2>
+      <div class="control-group">
+        <label>Control Rods Position: <span id="rodValue"
+            style="color: #00c8ff; font-family: 'Orbitron', sans-serif;">80</span>%</label>
+        <input type="range" id="controlRods" min="0" max="100" value="80">
+      </div>
+      <div class="control-group">
+        <label>Cooling Flow Rate: <span id="flowValue"
+            style="color: #00c8ff; font-family: 'Orbitron', sans-serif;">15000</span> L/min</label>
+        <input type="range" id="flowRate" min="5000" max="25000" value="15000" step="1000">
+      </div>
+      <div class="control-group">
+        <label>Generator Load: <span id="loadValue"
+            style="color: #00c8ff; font-family: 'Orbitron', sans-serif;">70</span>%</label>
+        <input type="range" id="generatorLoad" min="0" max="100" value="70">
+      </div>
+      <div class="control-group">
+        <label><input type="checkbox" id="autoShutdown" checked> Auto Safety Shutdown System</label>
+      </div>
+      <div>
+        <button onclick="emergencyCooling()" class="emergency">🚨 EMERGENCY COOLING</button>
+        <button onclick="resetPlant()" class="danger">🔄 RESET PLANT</button>
       </div>
     </div>
 
-    <div class="card">
-      <h2>⚡ GENERATOR <button class="module-toggle on" id="toggle-generator" onclick="toggleModule('generator')">ON</button></h2>
-      <div class="metric"><span class="metric-label">Power:</span><span class="metric-value" id="powerOutput">1000 MW</span></div>
-      <div class="metric"><span class="metric-label">Load:</span><span class="metric-value" id="generatorLoadDisplay">70%</span></div>
-      <div class="metric"><span class="metric-label">Voltage:</span><span class="metric-value" id="voltage">25000 V</span></div>
-      <div class="metric"><span class="metric-label">Frequency:</span><span class="metric-value" id="frequency">50.00 Hz</span></div>
-      <div class="metric"><span class="metric-label">Efficiency:</span><span class="metric-value" id="efficiency">95%</span></div>
+    <div class="grid">
+      <div class="card">
+        <h2>⚛️ REACTOR <button class="module-toggle on" id="toggle-reactor"
+            onclick="toggleModule('reactor')">ON</button></h2>
+        <div class="metric"><span class="metric-label">Temperature:</span><span class="metric-value"
+            id="reactorTemp">300°C</span></div>
+        <div class="metric"><span class="metric-label">Pressure:</span><span class="metric-value"
+            id="reactorPressure">155 bar</span></div>
+        <div class="metric"><span class="metric-label">Control Rods:</span><span class="metric-value"
+            id="reactorRods">80%</span></div>
+        <div class="metric"><span class="metric-label">Fuel Level:</span><span class="metric-value"
+            id="fuelLevel">100%</span></div>
+        <div class="metric"><span class="metric-label">Status:</span><span class="status-badge stable"
+            id="reactorStatus">STABLE</span></div>
 
-      <button class="settings-btn" onclick="toggleSettings('gen-settings')">⚙️ CUSTOM SETTINGS</button>
-      <div id="gen-settings" class="settings-panel">
-        <label style="font-size: 0.8em; color: #00ff88;">Target Frequency (Hz): <span id="freqTargetVal">50.0</span></label>
-        <input type="range" min="45" max="55" step="0.1" value="50" oninput="updateOffset('frequencyTarget', this.value)">
+        <button class="settings-btn" onclick="toggleSettings('reactor-settings')">⚙️ CUSTOM SETTINGS</button>
+        <div id="reactor-settings" class="settings-panel">
+          <label style="font-size: 0.8em; color: #00ff88;">Target Temp (°C): <span id="tempTargetVal">300</span></label>
+          <input type="range" min="100" max="600" value="300" oninput="updateOffset('tempTarget', this.value)">
+          <label style="font-size: 0.8em; color: #00ff88; margin-top: 10px; display: block;">Target Pressure (bar):
+            <span id="pressTargetVal">155</span></label>
+          <input type="range" min="50" max="300" value="155" oninput="updateOffset('pressureTarget', this.value)">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>⚡ GENERATOR <button class="module-toggle on" id="toggle-generator"
+            onclick="toggleModule('generator')">ON</button></h2>
+        <div class="metric"><span class="metric-label">Power:</span><span class="metric-value" id="powerOutput">1000
+            MW</span></div>
+        <div class="metric"><span class="metric-label">Load:</span><span class="metric-value"
+            id="generatorLoadDisplay">70%</span></div>
+        <div class="metric"><span class="metric-label">Voltage:</span><span class="metric-value" id="voltage">25000
+            V</span></div>
+        <div class="metric"><span class="metric-label">Frequency:</span><span class="metric-value" id="frequency">50.00
+            Hz</span></div>
+        <div class="metric"><span class="metric-label">Efficiency:</span><span class="metric-value"
+            id="efficiency">95%</span></div>
+
+        <button class="settings-btn" onclick="toggleSettings('gen-settings')">⚙️ CUSTOM SETTINGS</button>
+        <div id="gen-settings" class="settings-panel">
+          <label style="font-size: 0.8em; color: #00ff88;">Target Frequency (Hz): <span
+              id="freqTargetVal">50.0</span></label>
+          <input type="range" min="45" max="55" step="0.1" value="50"
+            oninput="updateOffset('frequencyTarget', this.value)">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>❄️ COOLING SYSTEM <button class="module-toggle on" id="toggle-cooling"
+            onclick="toggleModule('cooling')">ON</button></h2>
+        <div class="metric"><span class="metric-label">Primary Temp:</span><span class="metric-value"
+            id="primaryTemp">290°C</span></div>
+        <div class="metric"><span class="metric-label">Secondary Temp:</span><span class="metric-value"
+            id="secondaryTemp">40°C</span></div>
+        <div class="metric"><span class="metric-label">Flow Rate:</span><span class="metric-value"
+            id="coolingFlow">15000 L/min</span></div>
+        <div class="metric"><span class="metric-label">Pump Status:</span><span class="metric-value"
+            id="pumpStatus">OPERATIONAL</span></div>
+      </div>
+
+      <div class="card">
+        <h2>🌀 TURBINE <button class="module-toggle on" id="toggle-turbine"
+            onclick="toggleModule('turbine')">ON</button></h2>
+        <div class="metric"><span class="metric-label">Speed:</span><span class="metric-value" id="turbineSpeed">1800
+            RPM</span></div>
+        <div class="metric"><span class="metric-label">Steam Pressure:</span><span class="metric-value"
+            id="steamPressure">70 bar</span></div>
+        <div class="metric"><span class="metric-label">Vibration:</span><span class="metric-value" id="vibration">0.5
+            mm/s</span></div>
+        <div class="metric"><span class="metric-label">Status:</span><span class="status-badge stable"
+            id="turbineStatus">NORMAL</span></div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>❄️ COOLING SYSTEM <button class="module-toggle on" id="toggle-cooling" onclick="toggleModule('cooling')">ON</button></h2>
-      <div class="metric"><span class="metric-label">Primary Temp:</span><span class="metric-value" id="primaryTemp">290°C</span></div>
-      <div class="metric"><span class="metric-label">Secondary Temp:</span><span class="metric-value" id="secondaryTemp">40°C</span></div>
-      <div class="metric"><span class="metric-label">Flow Rate:</span><span class="metric-value" id="coolingFlow">15000 L/min</span></div>
-      <div class="metric"><span class="metric-label">Pump Status:</span><span class="metric-value" id="pumpStatus">OPERATIONAL</span></div>
+    <div class="card" style="margin-bottom: 30px;">
+      <h2>🛡️ SAFETY SYSTEMS</h2>
+      <div class="metric"><span class="metric-label">Radiation Level:</span><span class="metric-value"
+          id="radiation">0.1 mSv/h</span></div>
+      <div class="metric"><span class="metric-label">Emergency Cooling:</span><span class="metric-value"
+          id="emergStatus">OFF</span></div>
+      <div id="alarms"></div>
     </div>
 
     <div class="card">
-      <h2>🌀 TURBINE <button class="module-toggle on" id="toggle-turbine" onclick="toggleModule('turbine')">ON</button></h2>
-      <div class="metric"><span class="metric-label">Speed:</span><span class="metric-value" id="turbineSpeed">1800 RPM</span></div>
-      <div class="metric"><span class="metric-label">Steam Pressure:</span><span class="metric-value" id="steamPressure">70 bar</span></div>
-      <div class="metric"><span class="metric-label">Vibration:</span><span class="metric-value" id="vibration">0.5 mm/s</span></div>
-      <div class="metric"><span class="metric-label">Status:</span><span class="status-badge stable" id="turbineStatus">NORMAL</span></div>
-    </div>
-  </div>
+      <h2>📊 LIVE PERFORMANCE GRAPHS</h2>
 
-  <div class="card" style="margin-bottom: 30px;">
-    <h2>🛡️ SAFETY SYSTEMS</h2>
-    <div class="metric"><span class="metric-label">Radiation Level:</span><span class="metric-value" id="radiation">0.1 mSv/h</span></div>
-    <div class="metric"><span class="metric-label">Emergency Cooling:</span><span class="metric-value" id="emergStatus">OFF</span></div>
-    <div id="alarms"></div>
-  </div>
+      <div>
+        <h3 style="color: #00ff88; font-size: 1em;">🌡️ CORE THERMODYNAMICS</h3>
+        <p class="chart-desc">Tracks core heat and pressure. Stable range: 250-450°C. Spikes in pressure often follow
+          heat spikes.</p>
+        <div class="chart-container"><canvas id="tempChart"></canvas></div>
+      </div>
 
-  <div class="card">
-    <h2>📊 LIVE PERFORMANCE GRAPHS</h2>
-    
-    <div>
-      <h3 style="color: #00ff88; font-size: 1em;">🌡️ CORE THERMODYNAMICS</h3>
-      <p class="chart-desc">Tracks core heat and pressure. Stable range: 250-450°C. Spikes in pressure often follow heat spikes.</p>
-      <div class="chart-container"><canvas id="tempChart"></canvas></div>
-    </div>
+      <div style="margin-top: 30px;">
+        <h3 style="color: #00ff88; font-size: 1em;">⚡ POWER GENERATION</h3>
+        <p class="chart-desc">Tracks electricity output (MW) against Turbine speed. Higher RPM produces more power but
+          increases vibration.</p>
+        <div class="chart-container"><canvas id="powerChart"></canvas></div>
+      </div>
 
-    <div style="margin-top: 30px;">
-      <h3 style="color: #00ff88; font-size: 1em;">⚡ POWER GENERATION</h3>
-      <p class="chart-desc">Tracks electricity output (MW) against Turbine speed. Higher RPM produces more power but increases vibration.</p>
-      <div class="chart-container"><canvas id="powerChart"></canvas></div>
-    </div>
+      <div style="margin-top: 30px;">
+        <h3 style="color: #00ff88; font-size: 1em;">🔌 GRID STABILITY</h3>
+        <p class="chart-desc">Monitors Voltage and Frequency. Frequency must stay near 50Hz to prevent grid failure.</p>
+        <div class="chart-container"><canvas id="generatorChart"></canvas></div>
+      </div>
 
-    <div style="margin-top: 30px;">
-      <h3 style="color: #00ff88; font-size: 1em;">🔌 GRID STABILITY</h3>
-      <p class="chart-desc">Monitors Voltage and Frequency. Frequency must stay near 50Hz to prevent grid failure.</p>
-      <div class="chart-container"><canvas id="generatorChart"></canvas></div>
-    </div>
+      <div style="margin-top: 30px;">
+        <h3 style="color: #00ff88; font-size: 1em;">❄️ COOLING EFFICIENCY</h3>
+        <p class="chart-desc">Compares primary coolant temp vs secondary discharge. High flow rates lead to better
+          cooling.</p>
+        <div class="chart-container"><canvas id="coolingChart"></canvas></div>
+      </div>
 
-    <div style="margin-top: 30px;">
-      <h3 style="color: #00ff88; font-size: 1em;">❄️ COOLING EFFICIENCY</h3>
-      <p class="chart-desc">Compares primary coolant temp vs secondary discharge. High flow rates lead to better cooling.</p>
-      <div class="chart-container"><canvas id="coolingChart"></canvas></div>
+      <div style="margin-top: 30px;">
+        <h3 style="color: #00ff88; font-size: 1em;">⚠️ SAFETY & VIBRATION</h3>
+        <p class="chart-desc">Monitors mechanical integrity and radiation. Rapid vibration spikes indicate turbine
+          stress.</p>
+        <div class="chart-container"><canvas id="safetyChart"></canvas></div>
+      </div>
     </div>
 
-    <div style="margin-top: 30px;">
-      <h3 style="color: #00ff88; font-size: 1em;">⚠️ SAFETY & VIBRATION</h3>
-      <p class="chart-desc">Monitors mechanical integrity and radiation. Rapid vibration spikes indicate turbine stress.</p>
-      <div class="chart-container"><canvas id="safetyChart"></canvas></div>
-    </div>
-  </div>
-  
   </div>
 
   <script>
@@ -596,11 +794,11 @@
       star.style.animationDelay = Math.random() * 3 + 's';
       starsContainer.appendChild(star);
     }
-    
+
     let ws;
     let forceDisconnect = false;
     let tempData = [], powerData = [], turbineData = [], pressureData = [], labels = [];
-    
+
     // Interaction flags to prevent server updates from overwriting user input
     let isDraggingRods = false;
     let isDraggingFlow = false;
@@ -629,13 +827,13 @@
     function connect() {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       ws = new WebSocket(protocol + '//' + window.location.host + '/ws');
-      
+
       ws.onopen = () => {
         console.log('WebSocket connected');
         document.getElementById('connectionStatus').textContent = '● CONNECTED';
         document.getElementById('connectionStatus').className = 'connection-status connected';
       };
-      
+
       ws.onmessage = (event) => {
         console.log('WebSocket message received');
         try {
@@ -645,11 +843,11 @@
           console.error('Error parsing WebSocket data:', e);
         }
       };
-      
+
       ws.onerror = (error) => {
         console.error('WebSocket error:', error);
       };
-      
+
       ws.onclose = () => {
         console.log('WebSocket disconnected');
         document.getElementById('connectionStatus').textContent = '● DISCONNECTED';
@@ -686,7 +884,7 @@
           sourceEl.style.color = '#00c8ff';
         }
       }
-      
+
       // Reactor
       if (data.reactor) {
         setMetric('reactorTemp', data.reactor.temperature.toFixed(1) + '°C');
@@ -701,33 +899,33 @@
       const flowRateSlider = document.getElementById('flowRate');
       const generatorLoadSlider = document.getElementById('generatorLoad');
       const autoShutdownCheckbox = document.getElementById('autoShutdown');
-      
+
       if (data.reactor && !isDraggingRods) {
         controlRodsSlider.value = data.reactor.controlRods;
         document.getElementById('rodValue').textContent = data.reactor.controlRods;
       }
-      
+
       if (data.cooling && !isDraggingFlow) {
         flowRateSlider.value = data.cooling.flowRate;
         document.getElementById('flowValue').textContent = data.cooling.flowRate;
       }
-      
+
       if (data.generator && !isDraggingLoad) {
         generatorLoadSlider.value = data.generator.load;
         document.getElementById('loadValue').textContent = data.generator.load;
       }
-      
+
       if (data.safety && autoShutdownCheckbox.checked !== data.safety.autoShutdown) {
         autoShutdownCheckbox.checked = data.safety.autoShutdown;
       }
 
       // Generator
       if (data.generator) {
-        setMetric('powerOutput', data.generator.powerOutput + ' MW');
-        setMetric('generatorLoadDisplay', data.generator.load + '%');
-        setMetric('voltage', data.generator.voltage + ' V');
-        setMetric('frequency', data.generator.frequency.toFixed(2) + ' Hz');
-        setMetric('efficiency', data.generator.efficiency.toFixed(1) + '%');
+        setMetric('powerOutput', parseFloat(data.generator.powerOutput).toFixed(1) + ' MW');
+        setMetric('generatorLoadDisplay', parseFloat(data.generator.load).toFixed(1) + '%');
+        setMetric('voltage', parseFloat(data.generator.voltage).toFixed(0) + ' V');
+        setMetric('frequency', parseFloat(data.generator.frequency).toFixed(2) + ' Hz');
+        setMetric('efficiency', parseFloat(data.generator.efficiency).toFixed(1) + '%');
       }
 
       // Cooling
@@ -761,7 +959,7 @@
       if (data.safety) {
         document.getElementById('radiation').textContent = data.safety.radiationLevel.toFixed(2) + ' mSv/h';
         document.getElementById('emergStatus').textContent = data.safety.emergencyCooling ? 'ACTIVE' : 'OFF';
-        
+
         const alarmsDiv = document.getElementById('alarms');
         alarmsDiv.innerHTML = '';
         if (data.safety.alarms && data.safety.alarms.length > 0) {
@@ -820,30 +1018,30 @@
       const flowRateData = history.map(h => h.flowRate / 1000);
       const vibrationData = history.map(h => h.vibration);
       const radiationData = history.map(h => h.radiation);
-      
+
       drawChart('tempChart', [
         { label: 'Temperature (°C)', data: tempData, color: '#ff6384' },
         { label: 'Pressure (bar)', data: pressureData, color: '#36a2eb' }
       ]);
-      
+
       drawChart('powerChart', [
         { label: 'Power (MW)', data: powerData, color: '#00ff88' },
-        { label: 'Turbine Speed (RPM/10)', data: turbineData.map(v => v/10), color: '#ffce56' }
+        { label: 'Turbine Speed (RPM/10)', data: turbineData.map(v => v / 10), color: '#ffce56' }
       ]);
-      
+
       drawChart('generatorChart', [
         { label: 'Voltage (kV)', data: voltageData, color: '#00c8ff' },
         { label: 'Frequency (Hz)', data: frequencyData, color: '#ff6384' },
         { label: 'Efficiency (%)', data: efficiencyData, color: '#00ff88' },
         { label: 'Load (%)', data: loadData, color: '#ffa500' }
       ]);
-      
+
       drawChart('coolingChart', [
         { label: 'Primary Temp (°C)', data: coolingPrimaryData, color: '#ff6384' },
         { label: 'Secondary Temp (°C)', data: coolingSecondaryData, color: '#36a2eb' },
         { label: 'Flow Rate (k L/min)', data: flowRateData, color: '#00c8ff' }
       ]);
-      
+
       drawChart('safetyChart', [
         { label: 'Vibration (mm/s)', data: vibrationData, color: '#ffa500' },
         { label: 'Radiation (mSv/h)', data: radiationData, color: '#ff4444' }
@@ -860,16 +1058,16 @@
       ctx.scale(dpr, dpr);
       const width = rect.width;
       const height = rect.height;
-      
+
       ctx.clearRect(0, 0, width, height);
-      
+
       const paddingLeft = 70;
       const paddingRight = 120;
       const paddingTop = 45;
       const paddingBottom = 35;
       const chartWidth = width - paddingLeft - paddingRight;
       const chartHeight = height - paddingTop - paddingBottom;
-      
+
       // Compute global min/max across all datasets for shared Y axis
       let globalMin = Infinity, globalMax = -Infinity;
       datasets.forEach(ds => {
@@ -880,7 +1078,7 @@
       globalMin = globalMin - rangePad;
       globalMax = globalMax + rangePad;
       const range = globalMax - globalMin || 1;
-      
+
       // --- Draw Grid ---
       const gridLines = 5;
       ctx.strokeStyle = 'rgba(255,255,255,0.07)';
@@ -908,33 +1106,33 @@
         const x = paddingLeft + (idx / Math.max(totalPoints - 1, 1)) * chartWidth;
         ctx.fillText(idx + 's', x, paddingTop + chartHeight + 20);
       }
-      
+
       // --- Draw Border ---
       ctx.strokeStyle = 'rgba(0,200,255,0.25)';
       ctx.lineWidth = 1;
       ctx.strokeRect(paddingLeft, paddingTop, chartWidth, chartHeight);
-      
+
       // --- Draw Datasets ---
       datasets.forEach((dataset, dsIdx) => {
         if (!dataset.data || dataset.data.length < 2) return;
         const len = dataset.data.length;
-        
+
         // Smooth line
         ctx.strokeStyle = dataset.color;
         ctx.lineWidth = 2.5;
         ctx.lineJoin = 'round';
         ctx.beginPath();
-        
+
         const points = [];
         dataset.data.forEach((value, i) => {
           const x = paddingLeft + (i / (len - 1)) * chartWidth;
           const y = paddingTop + chartHeight - ((value - globalMin) / range) * chartHeight;
-          points.push({x, y});
+          points.push({ x, y });
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         });
         ctx.stroke();
-        
+
         // Gradient fill under the line
         const grad = ctx.createLinearGradient(0, paddingTop, 0, paddingTop + chartHeight);
         grad.addColorStop(0, dataset.color.replace(')', ',0.25)').replace('rgb', 'rgba'));
@@ -942,11 +1140,11 @@
         ctx.fillStyle = grad;
         ctx.beginPath();
         points.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
-        ctx.lineTo(points[points.length-1].x, paddingTop + chartHeight);
+        ctx.lineTo(points[points.length - 1].x, paddingTop + chartHeight);
         ctx.lineTo(points[0].x, paddingTop + chartHeight);
         ctx.closePath();
         ctx.fill();
-        
+
         // Dot + numeric value on the latest data point
         const lastPt = points[points.length - 1];
         const lastVal = dataset.data[len - 1];
@@ -957,14 +1155,14 @@
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;
         ctx.stroke();
-        
+
         // Glow ring around last point
         ctx.beginPath();
         ctx.arc(lastPt.x, lastPt.y, 9, 0, Math.PI * 2);
         ctx.strokeStyle = dataset.color + '66';
         ctx.lineWidth = 2;
         ctx.stroke();
-        
+
         // --- Legend + Latest Value on the right ---
         const legendY = paddingTop + 20 + dsIdx * 42;
         const legendX = paddingLeft + chartWidth + 12;
@@ -1041,4 +1239,5 @@
     connect();
   </script>
 </body>
+
 </html>

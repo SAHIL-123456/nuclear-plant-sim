@@ -262,6 +262,48 @@ app.get('/', (req, res) => {
 
 startSimulation();
 
+// --- CLOUD UPLINK LOGIC ---
+const CLOUD_SYNC_URL = process.env.CLOUD_SYNC_URL;
+let lastSyncTime = 0;
+
+async function syncToCloud(payload) {
+  if (!CLOUD_SYNC_URL) return;
+  
+  const now = Date.now();
+  // Throttle to 2 updates per second to avoid rate limits
+  if (now - lastSyncTime < 500) return;
+  lastSyncTime = now;
+
+  try {
+    const response = await fetch(`${CLOUD_SYNC_URL.replace(/\/$/, '')}/api/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        console.error('Cloud Sync Failed:', response.statusText);
+    }
+  } catch (err) {
+    console.error('Cloud Sync Error:', err.message);
+  }
+}
+
+// Endpoint to receive sync data (Cloud Side)
+app.post('/api/sync', (req, res) => {
+  if (req.body) {
+    // Merge incoming data into local state
+    mergeState(state, req.body);
+    // Force source to MATLAB so UI knows it's live data
+    state.source = 'MATLAB';
+    state.timestamp = Date.now();
+    
+    // Broadcast to all cloud users
+    broadcast(state);
+    return res.json({ success: true });
+  }
+  res.status(400).json({ error: 'No data provided' });
+});
+
 // --- MATLAB TCP BRIDGE ---
 const TCP_PORT = 3001;
 const tcpServer = net.createServer((socket) => {
@@ -280,6 +322,11 @@ const tcpServer = net.createServer((socket) => {
         const matlabData = JSON.parse(part);
         // Map MATLAB data to server state deep merge
         mergeState(state, matlabData);
+        
+        // Push to cloud if configured
+        if (CLOUD_SYNC_URL) {
+            syncToCloud(matlabData);
+        }
       } catch (e) {
         console.error('Error parsing MATLAB data:', e.message);
       }
